@@ -122,7 +122,7 @@ public class LocalDbContainer implements IDbConnector {
 		ConferenceScore score = getConferenceScore(confId);
 		if (score == null) {
 			logger.warn("Conference " + confId + " score is not ready.");
-			score = new ConferenceScore(0, 0);
+			score = new ConferenceScore(-1, -1);
 		}
 				
 		// Get conference channel IDs
@@ -140,10 +140,12 @@ public class LocalDbContainer implements IDbConnector {
 			return null;
 		}
 		
+		String confId = "";
+		
 		// if confId instead of folderPath is passed in
 		if (folderPath.length() < 50) {
 			logger.trace("Received conference uuid to find conference channels, getting it's path...");
-			String confId = folderPath;
+			confId = folderPath;
 			List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
 			if (folder.isEmpty()) {
 				logger.error("Cannot find conference " + confId + ".");
@@ -160,14 +162,16 @@ public class LocalDbContainer implements IDbConnector {
 		LocalDateTime startTime = defaultTime;
 		LocalDateTime endTime = defaultTime;
 		
-		for (int i=0; i<channelIds.size(); i++) {
-			String chanId = channelIds.get(i);
-			
-			if (new File(defaultPath+"ChanList.txt").exists())
-				channels.add(new LocalDbChannel(chanId, startTime, endTime, null, getChannelScore(chanId)));
-			else
-				channels.add(new LocalDbChannel(chanId, startTime, endTime, null, null));
-		}
+		if (channelIds != null && !channelIds.isEmpty())
+			for (String channelId : channelIds) {
+				channels.add(findChannel(confId, channelId, false));
+	//			String chanId = channelIds.get(i);
+	//			
+	//			if (new File(defaultPath+"ChanList.txt").exists())
+	//				channels.add(new LocalDbChannel(chanId, startTime, endTime, null, getChannelScore(chanId)));
+	//			else
+	//				channels.add(new LocalDbChannel(chanId, startTime, endTime, null, null));
+			}
 		
 		return channels;
 	}
@@ -183,6 +187,11 @@ public class LocalDbContainer implements IDbConnector {
 		if (confId == null || confId.length() <= 0) {
 			logger.debug("Conference uuid not provided. Get it from channel uuid...");
 			confId = getChannelConference(chanId);
+			if (confId == null || confId.length() <= 0) {
+				logger.error("Conference does not exists.");
+				return null;
+			}
+				
 		}
 		
 		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
@@ -213,7 +222,7 @@ public class LocalDbContainer implements IDbConnector {
 		ChannelScore score = getChannelScore(chanId);
 		if (score == null) {
 			logger.warn("Channel " + chanId + " score is not ready.");
-			score = new ChannelScore(0, 0, 0);
+			score = new ChannelScore(-1, -1, -1);
 		}
 		
 		LocalDbChannel channel = new LocalDbChannel(chanId, startTime, endTime, stats, score);	
