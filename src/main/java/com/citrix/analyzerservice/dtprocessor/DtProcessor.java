@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
 import com.citrix.analyzerservice.dbconnector.DbConnectorFactory;
 import com.citrix.analyzerservice.dbconnector.IDbConnector;
 import com.citrix.analyzerservice.dbconnector.LocalDbChannel;
@@ -17,61 +19,79 @@ import com.citrix.analyzerservice.model.ConferenceScore;
 public class DtProcessor extends TimerTask implements IDtProcessor {
 	
 	// Constants definitions
-	final int kMaxStatsValues = 6000;
 	final double cVADLevelDiff = 20;
 	final int cQuantumSizeMs = 10;
 	final int cTime = 1; // time in sec
 	
+	private static final Logger logger = Logger.getLogger(DtProcessor.class);
+	
 	DbConnectorFactory dcf = new DbConnectorFactory();
 	IDbConnector ldc = dcf.getDbContainer("LOCAL");
 	
-	List<String> newConfIds = null;
+	Map<String, List<String>> updatedConfIds = null;
 	
 	public DtProcessor() {}
 	
 	public void run() {
-		System.out.println("\nStart DataProcessor ...");
+		logger.info("Start data processor...");
 		
 		if (checkUpdate()) {
-			System.out.println("New data found. Start processing ...");
-
-			List<ConferenceScore> confScores = new ArrayList<ConferenceScore>();
-			ConferenceScore confScore = new ConferenceScore(0, 0);
+			logger.info("Data updated. Start processing...");
 			
-			for (String confId : newConfIds) {
+			if (updatedConfIds.containsKey("newConfIds")) {
+				List<String> newConfIds = updatedConfIds.get("newConfIds");
+				logger.info("Found " + newConfIds.size() + " new conferences.");
 				
-				List<LocalDbChannel> channels = ldc.findConfChannels(confId);
-				List<ChannelScore> chanScores = new ArrayList<ChannelScore>();
+				List<ConferenceScore> confScores = new ArrayList<ConferenceScore>();
+				ConferenceScore confScore = new ConferenceScore(0, 0);
 				
-				for (LocalDbChannel channel : channels) {					
-					ChannelScore chanScore = calChannelScore(confId, channel.getUuid());
-					chanScores.add(chanScore);
+				for (String newConfId : newConfIds) {
+					
+					List<LocalDbChannel> channels = ldc.findConfChannels(newConfId);
+					List<ChannelScore> chanScores = new ArrayList<ChannelScore>();
+					
+					for (LocalDbChannel channel : channels) {					
+						ChannelScore chanScore = calChannelScore(newConfId, channel.getUuid());
+						chanScores.add(chanScore);
+					}
+					
+					if (!updateChanList(newConfId, chanScores))
+						logger.error("Cannot update ChanList.");
+					
+					confScore = calConferenceScore(newConfId, chanScores);
+					confScores.add(confScore);
+				}		
+				
+				if (!updateConfList(newConfIds, confScores))
+					logger.error("Cannot update ConfList.");
+			}
+			
+			if (updatedConfIds.containsKey("oldConfIds")) {
+				List<String> oldConfIds = updatedConfIds.get("oldConfIds");
+				logger.info("Found " + oldConfIds.size() + " deprecated conferences.");
+				
+				for (String oldConfId : oldConfIds) {
+					if (!ldc.updateFile("conference", oldConfId))
+						logger.error("Cannot delete items in ConfList.");
+					if (!ldc.updateFile("channel", oldConfId))
+						logger.error("Cannot delete items in ChanList.");
 				}
-				
-//				System.out.println(chanScores.size());
-				updateChanList(confId, chanScores);
-				
-				confScore = calConferenceScore(confId, chanScores);
-				confScores.add(confScore);
-			}		
+			}
 			
-			updateConfList(newConfIds, confScores);
-			
-			System.out.println("Finish processing ...");
-		}
-		else
-			System.out.println("No data update.");
+			logger.info("Finish processing...");
+		} else {
+			logger.info("No data update.");
+		}		
 		
-		System.out.println("Stop DataProcessor ...");
-		
+		logger.info("Stop DataProcessor...");		
 	}
 	
 	@Override
 	public boolean checkUpdate() {
 		
-		newConfIds = ldc.findNewConfIds();
+		updatedConfIds = ldc.findUpdatedConfIds();
 		
-		if (newConfIds == null || newConfIds.isEmpty())
+		if (updatedConfIds == null || updatedConfIds.isEmpty())
 			return false;
 		
 		return true;
@@ -129,8 +149,10 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		if (channels == null || channels.isEmpty())
 			return null;
 		
-		if (channels.size() != chanScores.size())
+		if (channels.size() != chanScores.size()) {
+			logger.error("Channels number and ChannelScores number not matched.");
 			return null;
+		}
 		
 		ConferenceScore score = new ConferenceScore(0, 0);
 		
@@ -159,10 +181,6 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		double[] seqNr = stats.getStrProcessor().getSeqNr();
 		double[] speechValues = stats.getStrProcessor().getNS_speechPowerOut();
 		double[] noiseValues = stats.getStrProcessor().getNS_noisePowerOut();
-		
-//		double[] seqNr = Arrays.copyOf(stats.getStrProcessor().getSeqNr(), kMaxStatsValues);
-//		double[] speechValues = Arrays.copyOf(stats.getStrProcessor().getNS_speechPowerOut(), kMaxStatsValues);
-//		double[] noiseValues = Arrays.copyOf(stats.getStrProcessor().getNS_noisePowerOut(), kMaxStatsValues);
 		
 		size = speechValues.length;
 		

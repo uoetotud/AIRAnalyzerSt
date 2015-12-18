@@ -8,20 +8,18 @@ import java.util.Map;
 import com.citrix.analyzerservice.model.ChannelStats;
 
 public interface IDbConnector {
-	
-//	List<String> findAllConfIds(String path);
-//	List<String> findProConfIds(String path);
-	List<String> findNewConfIds();
+
+	Map<String, List<String>> findUpdatedConfIds();
 	
 	List<LocalDbConference> findConferenceList();
 	
 	LocalDbConference findConference(String confId, boolean showAll);
-	LocalDateTime findConferenceTimestamp(String folder);
-	
+	LocalDateTime findConferenceTimestamp(String folder);	
 	List<LocalDbChannel> findConfChannels(String folderPath);
 	
 	LocalDbChannel findChannel(String confId, String chanId, boolean showAll);
 	ChannelStats findChannelStats(String confId, String chanId);
 	
-	boolean writeFile(String type, String[] content);
+	boolean writeFile(String type, String[] content);	
+	boolean updateFile(String type, String confId);
 }

@@ -10,12 +10,12 @@ public class DbContainer {
 	DbConnectorFactory dcf = new DbConnectorFactory();
 	IDbConnector ldc = dcf.getDbContainer("LOCAL");
 	
-	public void getNewConfIds() {
-		List<String> confIds = ldc.findNewConfIds();
-		
-		for (int i=0; i<confIds.size(); i++)
-			System.out.println(confIds.get(i));
-	}
+//	public void getUpdatedConfIds() {
+//		List<String> confIds = ldc.findUpdatedConfIds();
+//		
+//		for (int i=0; i<confIds.size(); i++)
+//			System.out.println(confIds.get(i));
+//	}
 	
 	public void GetConference() {
 		LocalDbConference conference = ldc.findConference("00000000-0000-0000-0000000000000000", true);

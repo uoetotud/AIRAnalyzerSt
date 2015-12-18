@@ -4,8 +4,7 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
         <property name="java-output-path" value="/AIRAnalyzerSt/build/classes"/>
-        <property name="context-root" value="AIRAnalyzer"/>
+        <property name="context-root" value="AIRAnalyzerService"/>
     </wb-module>
 </project-modules>

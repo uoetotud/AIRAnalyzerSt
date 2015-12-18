@@ -19,11 +19,12 @@ public class MainTest {
 	static LocalDbContainer ldc = new LocalDbContainer();
 	static DtProcessor dp = new DtProcessor();
 
-//	public static void main(String[] args) {
-//
-//		testFindConfForChannel();
-//		
-//	}
+	public static void main(String[] args) {
+
+		testUpdateFile("conference", "00000000-0000-0000-0000000000000000");
+		testUpdateFile("channel", "00000000-0000-0000-0000000000000000");
+		
+	}
 	
 	static void testConfigProperties() {
 		Config config = new Config();
@@ -56,38 +57,46 @@ public class MainTest {
 		System.out.println(channel.getScore().getAvgPLIndicator() + ", " + channel.getScore().getAvgLevelIndicator() + ", " + channel.getScore().getAvgPacketLoss());
 	}
 	
-	static void testDtProcessor() {
-		
-		List<String> newConfIds = ldc.findNewConfIds();
-		
-		if (newConfIds != null || !newConfIds.isEmpty()) {
-			
-			List<ConferenceScore> confScores = new ArrayList<ConferenceScore>();
-			ConferenceScore confScore = new ConferenceScore(0, 0);
-			
-			for (String confId : newConfIds) {
-				
-				List<LocalDbChannel> channels = ldc.findConfChannels(confId);
-				List<ChannelScore> chanScores = new ArrayList<ChannelScore>();
-				
-				for (LocalDbChannel channel : channels) {					
-					ChannelScore chanScore = dp.calChannelScore(confId, channel.getUuid());
-					chanScores.add(chanScore);
-				}
-				
-//				System.out.println(chanScores.size());
-				dp.updateChanList(confId, chanScores);
-				
-				confScore = dp.calConferenceScore(confId, chanScores);
-				confScores.add(confScore);
-			}		
-			
-			dp.updateConfList(newConfIds, confScores);
-		}
-	}
+//	static void testDtProcessor() {
+//		
+//		List<String> newConfIds = ldc.findNewConfIds();
+//		
+//		if (newConfIds != null || !newConfIds.isEmpty()) {
+//			
+//			List<ConferenceScore> confScores = new ArrayList<ConferenceScore>();
+//			ConferenceScore confScore = new ConferenceScore(0, 0);
+//			
+//			for (String confId : newConfIds) {
+//				
+//				List<LocalDbChannel> channels = ldc.findConfChannels(confId);
+//				List<ChannelScore> chanScores = new ArrayList<ChannelScore>();
+//				
+//				for (LocalDbChannel channel : channels) {					
+//					ChannelScore chanScore = dp.calChannelScore(confId, channel.getUuid());
+//					chanScores.add(chanScore);
+//				}
+//				
+////				System.out.println(chanScores.size());
+//				dp.updateChanList(confId, chanScores);
+//				
+//				confScore = dp.calConferenceScore(confId, chanScores);
+//				confScores.add(confScore);
+//			}		
+//			
+//			dp.updateConfList(newConfIds, confScores);
+//		}
+//	}
 	
 	static void testFindConfForChannel() {
 //		System.out.println(ldc.getChannelConference("B620092E-1B06-4A4D-829811D6003FB46C"));
+	}
+	
+	static Map<String, List<String>> getUpdatedConfIds() {
+		return ldc.findUpdatedConfIds();
+	}
+	
+	static void testUpdateFile(String type, String confId) {
+		ldc.updateFile(type, confId);
 	}
 	
 }

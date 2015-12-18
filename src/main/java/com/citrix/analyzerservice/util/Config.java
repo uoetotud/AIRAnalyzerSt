@@ -8,23 +8,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public class Config {
 
+	private static final Logger logger = Logger.getLogger(Config.class);
 	Map<String, String> configs = new HashMap<String, String>();
 	InputStream inputStream;
  
 	public Map<String, String> getPropValues() {
  
+		String propFileName = "config.properties";
+		
 		try {
-			Properties prop = new Properties();
-			String propFileName = "config.properties";
- 
+			Properties prop = new Properties(); 
 			inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
  
 			if (inputStream != null) {
 				prop.load(inputStream);
 			} else {
-				throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+				logger.error("Cannot find '" + propFileName + "' configuration file.");
 			}
 			
 			Enumeration<?> e = prop.propertyNames();
@@ -34,12 +37,12 @@ public class Config {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error in Config class.");
 		} finally {
 			try {
 				inputStream.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Cannot close " + propFileName + " file.");
 			}
 		}
 		
