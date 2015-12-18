@@ -76,7 +76,7 @@ public class LocalDbContainer implements IDbConnector {
 		List<String> confIds = findAllConfIds(defaultPath);		
 		if (confIds == null || confIds.isEmpty()) {
 			logger.warn("No conference found.");
-			return null;
+			return new ArrayList<LocalDbConference>();
 		}
 		
 		List<LocalDbConference> conferences = new ArrayList<LocalDbConference>();
@@ -142,7 +142,7 @@ public class LocalDbContainer implements IDbConnector {
 		
 		// if confId instead of folderPath is passed in
 		if (folderPath.length() < 50) {
-			logger.debug("Received conference uuid, get it's path...");
+			logger.trace("Received conference uuid to find conference channels, getting it's path...");
 			String confId = folderPath;
 			List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
 			if (folder.isEmpty()) {
@@ -438,7 +438,7 @@ public class LocalDbContainer implements IDbConnector {
 			}
 			
 		} catch (FileNotFoundException e) {
-			logger.warn("ConfList file not exists.");
+			logger.warn("Cannot find ConfList.txt.");
 		} catch (IOException e) {
 			logger.error("Error in reading ConfList file.");
 		} finally {
@@ -540,7 +540,7 @@ public class LocalDbContainer implements IDbConnector {
 		
 		// if confId instead of folderPath is passed in
 		if (folder.length() < 50) {
-			logger.debug("Received conference uuid, get it's path...");
+			logger.trace("Received conference uuid to find conference timestamp, getting it's path...");
 			String confId = folder;
 			List<String> folders = getFileNameFromId(defaultPath, confId, "folder");
 			if (folder.isEmpty()) {

@@ -19,6 +19,7 @@ public class Main {
 	private static String BASE_URI = "";
 	private static String host = "";
 	private static String port = "";
+	private static String dtProcessorExecPeriod = "";
 	private static final Logger logger = Logger.getLogger(Main.class);
 
 	private static HttpServer startServer(String host, String port) {
@@ -32,14 +33,14 @@ public class Main {
 	private static void checkConfig() {
 		host = properties.get("Host");
 		port = properties.get("Port");
-		String period = properties.get("DataProcessor_Execution_Period");
+		dtProcessorExecPeriod = properties.get("DataProcessor_Execution_Period");
 		String lines = properties.get("MAX_Stats_Read_Line");
 		String directory = properties.get("File_Directory");
 		
 		logger.debug("********** config.properties *********");
 		logger.debug("Host :: " + host);
 		logger.debug("Port :: " + port);
-		logger.debug("DataProcessor_Execution_Period :: " + period);
+		logger.debug("DataProcessor_Execution_Period :: " + dtProcessorExecPeriod + "s");
 		logger.debug("MAX_Stats_Read_Line :: " + lines);
 		logger.debug("File_Directory :: " + directory);
 		logger.debug("********** config.properties *********");
@@ -60,17 +61,15 @@ public class Main {
 		final HttpServer server = startServer(host, port);
 		logger.info(String.format("AIRAnalyzerService started at %s\nHit enter to stop...", BASE_URI));
 		        
-		// Background running	
-		String dtProcessorExecPeriod = properties.get("DataProcessor_Execution_Period");
-		
+		// Background running		
 		if (dtProcessorExecPeriod == null || dtProcessorExecPeriod.isEmpty()) {
 			logger.warn("Data processor execution period is not configured. Use default value: 1 hour.");
 			dtProcessorExecPeriod = "3600000";
 		} else
-			logger.debug("Config: Data processor executes every " + Integer.parseInt(dtProcessorExecPeriod)/1000 + " seconds.");
+			logger.debug("Config: Data processor executes every " + Integer.parseInt(dtProcessorExecPeriod) + " seconds.");
 		
 		Timer timer = new Timer();
-		timer.schedule(new DtProcessor(), 0, Integer.parseInt(dtProcessorExecPeriod));
+		timer.schedule(new DtProcessor(), 0, Integer.parseInt(dtProcessorExecPeriod)*1000);
 		// Background running
         
 		System.in.read();

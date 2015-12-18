@@ -17,6 +17,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
 import com.citrix.analyzerservice.dbconnector.DbConnectorFactory;
 import com.citrix.analyzerservice.dbconnector.IDbConnector;
 import com.citrix.analyzerservice.dbconnector.LocalDbChannel;
@@ -33,6 +35,7 @@ import com.google.gson.JsonParseException;
 @Path("/QueryAPI")
 public class WsHandler {
 	
+	private static final Logger logger = Logger.getLogger(WsHandler.class);
 	DtCollector dc = new DtCollector();
 
 	@GET
@@ -51,6 +54,9 @@ public class WsHandler {
 	@Path("/Conferences")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getConferenceList() {
+		
+		logger.info("Received getting conference list request.");
+		
 		List<LocalDbConference> conferenceList = dc.getConferenceList();
 				
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -69,6 +75,9 @@ public class WsHandler {
 	@Path("/Conferences/{confId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getConferenceSummary(@PathParam("confId") String confId) {
+		
+		logger.info("Received getting conference summary request.");
+		
 		LocalDbConference container = dc.getConferenceSummary(confId);
 				
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -80,6 +89,9 @@ public class WsHandler {
 	@Path("/Conferences/{confId}/Details")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getConferenceDetails(@PathParam("confId") String confId) {
+		
+		logger.info("Received getting conference details request.");
+		
 		LocalDbConference container = dc.getConferenceDetails(confId);
 				
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -91,6 +103,9 @@ public class WsHandler {
 	@Path("/Conferences/{confId}/Channels")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getConfChannels(@PathParam("confId") String confId) {
+		
+		logger.info("Received getting conference channels request.");
+		
 		List<LocalDbChannel> channels = dc.getConfChannels(confId);
 				
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -102,6 +117,9 @@ public class WsHandler {
 	@Path("/Channels/{chanId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getChannelSummary(@PathParam("chanId") String chanId) {
+		
+		logger.info("Received getting channel summary request.");
+		
 		LocalDbChannel channel = dc.getChannelSummary(chanId);
 				
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -113,6 +131,9 @@ public class WsHandler {
 	@Path("/Channels/{chanId}/Details")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getChannelDetails(@PathParam("chanId") String chanId) {
+		
+		logger.info("Received getting channel details request.");
+		
 		LocalDbChannel channel = dc.getChannelDetails(chanId);
 				
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
