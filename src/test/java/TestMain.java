@@ -1,0 +1,20 @@
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
+
+import dbconnector.TestLocalDbContainer;
+import util.TestCache;
+
+public class TestMain {
+
+	public static void main(String[] args) {
+		Result result = JUnitCore.runClasses(TestCache.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		
+		System.out.println(result.wasSuccessful());
+
+	}
+
+}

@@ -36,6 +36,8 @@ public class Config {
 				configs.put(key, prop.getProperty(key));
 			}
 			
+			checkConfig(configs);
+			
 		} catch (Exception e) {
 			logger.error("Error in Config class.");
 		} finally {
@@ -47,6 +49,29 @@ public class Config {
 		}
 		
 		return configs;
+	}
+	
+	private static void checkConfig(Map<String, String> properties) {
+		String host = properties.get("Host");
+		String port = properties.get("Port");
+		String dtProcessorExecPeriod = properties.get("DataProcessor_Execution_Period");
+		String lines = properties.get("MAX_Stats_Read_Line");
+		String directory = properties.get("File_Directory");
+		
+		logger.debug("********** config.properties *********");
+		logger.debug("Host :: " + host);
+		logger.debug("Port :: " + port);
+		logger.debug("DataProcessor_Execution_Period :: " + dtProcessorExecPeriod + "s");
+		logger.debug("MAX_Stats_Read_Line :: " + lines);
+		logger.debug("File_Directory :: " + directory);
+		logger.debug("********** config.properties *********");
+		
+		if (host.isEmpty())
+			logger.error("HOST name needs to be configured in 'config.properties' file.");
+		if (lines == null || lines.isEmpty())
+			logger.warn("Maximal line number to read file is not configured. Use default value: all.");
+		if (directory == null || directory.isEmpty())
+			logger.error("File directory needs to be configured in 'config.properties' file.");		
 	}
 	
 }
