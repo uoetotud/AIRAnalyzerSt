@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
+import com.citrix.analyzerservice.model.CacheItem;
+
 public class Cache<K, V> implements ICache<K, V> {
 	
 	private static final Logger logger = Logger.getLogger(Cache.class);
@@ -16,9 +18,13 @@ public class Cache<K, V> implements ICache<K, V> {
 	private int maxSize;
 	private ConcurrentHashMap<K, V> cacheMap;
 	
-	public Cache(String type, long timeOut, final long clearInterval, int maxSize) {
-		logger.info("New " + type + " cache created - time out: " + timeOut + " seconds; MAX size: " + maxSize + 
-				"; clear every " + clearInterval + " seconds.");
+	public Cache(String type, long timeOut, final long cleanInterval, int maxSize) {
+		if (!type.equalsIgnoreCase("LRU") && !type.equalsIgnoreCase("LFU")) {
+			type = "LRU";
+			logger.warn("Cache type not specified or invalid - use default type: LRU.");
+		}
+		
+		logger.info("New " + type + " cache created (MaxSize: " + maxSize + "; TimeOut: " + timeOut + "s; CleanInterval: " + cleanInterval + "s)");
 		
 		this.type = type;
 		this.timeOut = timeOut * 1000;
@@ -29,10 +35,9 @@ public class Cache<K, V> implements ICache<K, V> {
 			public void run() {
 				while (true) {
 					try {
-						Thread.sleep(clearInterval * 1000);
+						Thread.sleep(cleanInterval * 1000);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
-						// TODO - logging
+						logger.error("Thread for waiting to clean up cache interrupted.");
 					}
 					cleanup();
 				}
@@ -81,10 +86,10 @@ public class Cache<K, V> implements ICache<K, V> {
 			
 			if (type.equalsIgnoreCase("LRU")) {
 				keyToRemove = findLruKey();
-				logger.warn("Cache is full. Replace LRU item with key: " + keyToRemove.toString());
+				logger.warn("LRU Cache is full. Replace item with key: " + keyToRemove.toString());
 			} else if (type.equalsIgnoreCase("LFU")) {
 				keyToRemove = findLfuKey();
-				logger.warn("Cache is full. Replace LFU item with key: " + keyToRemove.toString());
+				logger.warn("LFU Cache is full. Replace item with key: " + keyToRemove.toString());
 			}
 			
 			remove(keyToRemove);
@@ -101,6 +106,11 @@ public class Cache<K, V> implements ICache<K, V> {
 		}
 		
 		cacheMap.remove(key);		
+	}
+	
+	@Override
+	public boolean contains(K key) {
+		return cacheMap.containsKey(key);
 	}
 
 	@Override
@@ -123,7 +133,8 @@ public class Cache<K, V> implements ICache<K, V> {
 				keysToRemove.add(key);
 		}
 		
-		logger.info(keysToRemove.size() + " cache item(s) expired.");
+		if (keysToRemove.size() > 0)
+			logger.info(keysToRemove.size() + " cache item expired.");
 		
 		for (K k : keysToRemove) {
 			cacheMap.remove(k);

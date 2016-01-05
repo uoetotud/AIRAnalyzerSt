@@ -2,10 +2,11 @@ package com.citrix.analyzerservice.util;
 
 public interface ICache<K, V> {
 
-	public V get(K key);
-	public void put(K key, V value);
-	public void remove(K key);
-	public int size();
-	public void cleanup();
+	V get(K key);
+	void put(K key, V value);
+	void remove(K key);
+	boolean contains(K key);
+	int size();
+	void cleanup();
 	
 }

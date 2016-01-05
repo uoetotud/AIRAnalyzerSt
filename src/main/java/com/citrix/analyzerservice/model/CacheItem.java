@@ -1,4 +1,4 @@
-package com.citrix.analyzerservice.util;
+package com.citrix.analyzerservice.model;
 
 public class CacheItem<V> {
 
@@ -9,7 +9,7 @@ public class CacheItem<V> {
 	public CacheItem(V cacheObject, long timeStamp) {
 		this.cacheObject = cacheObject;
 		this.timeStamp = timeStamp;
-		this.hitCount = 0;
+		this.hitCount = 1;
 	}
 	
 	public V getCacheObject() {

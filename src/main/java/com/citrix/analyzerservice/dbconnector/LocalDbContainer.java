@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.citrix.analyzerservice.model.CacheItem;
 import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ChannelStats;
 import com.citrix.analyzerservice.model.ConferenceScore;
@@ -26,17 +27,35 @@ import com.citrix.analyzerservice.model.ConferenceStats;
 import com.citrix.analyzerservice.model.Mixer;
 import com.citrix.analyzerservice.model.StreamEnhancer;
 import com.citrix.analyzerservice.model.StreamProcessor;
+import com.citrix.analyzerservice.util.Cache;
 import com.citrix.analyzerservice.util.Config;
 
 public class LocalDbContainer implements IDbConnector {
 
 	private final Logger logger = Logger.getLogger(LocalDbContainer.class);
 	private LocalDateTime defaultTime = LocalDateTime.MIN;
+	
 	private Map<String, String> properties = new Config().getPropValues();
 	private String defaultPath = properties.get("File_Directory");	
 	private String maxStatsReadLine = properties.get("MAX_Stats_Read_Line");
+	private String cacheEnabled = properties.get("Cache_Enable");
+	private String cacheType = properties.get("Cache_Type");
+	private String cacheTimeOut = properties.get("Cache_TimeOut");
+	private String cacheCleanInterval = properties.get("Cache_Clean_Interval");
+	private String cacheSize = properties.get("Cache_Size");
+	
+	private Cache<String, CacheItem> cache = null;
+	private boolean cacheIsEnabled = false;
 			
-	public LocalDbContainer() {}
+	public LocalDbContainer() {
+		if (cacheEnabled.equalsIgnoreCase("true")) {
+			logger.info("Cache enabled.");
+			cache = new Cache<String, CacheItem>(cacheType, Long.parseLong(cacheTimeOut), Long.parseLong(cacheCleanInterval), Integer.parseInt(cacheSize));
+			cacheIsEnabled = true;
+		} else {
+			logger.info("Cache NOT enabled.");
+		}
+	}
 	
 	@Override
 	public Map<String, List<String>> findUpdatedConfIds() {
@@ -73,7 +92,7 @@ public class LocalDbContainer implements IDbConnector {
 	
 	@Override
 	public List<LocalDbConference> findConferenceList() {
-		List<String> confIds = findAllConfIds(defaultPath);		
+		List<String> confIds = findAllConfIds(defaultPath);
 		if (confIds == null || confIds.isEmpty()) {
 			logger.warn("No conference found.");
 			return new ArrayList<LocalDbConference>();
@@ -99,9 +118,38 @@ public class LocalDbContainer implements IDbConnector {
 		
 		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
 		if (folder.isEmpty()) {
-			logger.error("Cannot find conference " + confId + ".");
+			logger.warn("Cannot find conference " + confId + ".");
 			return null;
 		}
+		
+		LocalDbConference conference = null;
+		
+		/* NEW */
+		// Check cache
+		if (cacheIsEnabled == true) {
+			if (showAll) {
+				if (cache != null && cache.contains(confId)) {
+					conference = (LocalDbConference) cache.get(confId).getCacheObject();
+					
+					logger.info("Conference " + confId + " stats cached.");
+					
+					return conference;
+				} else {
+					logger.info("Conference " + confId + " stats NOT cached.");
+				}
+			} else {
+				if (cache != null && cache.contains(confId+"i")) {
+					conference = (LocalDbConference) cache.get(confId+"i").getCacheObject();
+					
+					logger.info("Conference " + confId + " info cached.");
+					
+					return conference;
+				} else {
+					logger.info("Conference " + confId + " info NOT cached.");
+				}
+			}
+		}
+		/* NEW */
 		
 		String folderPath = defaultPath + folder.get(0);
 		
@@ -128,7 +176,17 @@ public class LocalDbContainer implements IDbConnector {
 		// Get conference channel IDs
 		List<LocalDbChannel> channels = findConfChannels(folderPath);
 		
-		LocalDbConference conference = new LocalDbConference(confId, timestamp, startTime, endTime, channels.size(), stats, score, channels);
+		conference = new LocalDbConference(confId, timestamp, startTime, endTime, channels.size(), stats, score, channels);
+		
+		/* NEW */
+		if (cacheIsEnabled == true) {
+			if (showAll) {				
+				cache.put(confId, new CacheItem(conference, System.currentTimeMillis()));
+			} else {
+				cache.put(confId+"i", new CacheItem(conference, System.currentTimeMillis()));
+			}
+		}
+		/* NEW */
 		
 		return conference;
 	}
@@ -499,8 +557,8 @@ public class LocalDbContainer implements IDbConnector {
 					files.add(fileLists[i].getName()); 
 		}
 		
-		if (files.isEmpty())
-			logger.warn("Cannot find file from uuid " + uuid + " in " + path + ".");
+//		if (files.isEmpty())
+//			logger.warn("Cannot find file from uuid " + uuid + " in " + path + ".");
 		
 		return files;
 	}
