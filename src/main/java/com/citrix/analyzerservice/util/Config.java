@@ -15,6 +15,8 @@ public class Config {
 	private static final Logger logger = Logger.getLogger(Config.class);
 	Map<String, String> configs = new HashMap<String, String>();
 	InputStream inputStream;
+	
+	public Config() {}
  
 	public Map<String, String> getPropValues() {
  
@@ -36,7 +38,7 @@ public class Config {
 				configs.put(key, prop.getProperty(key));
 			}
 			
-			checkConfig(configs);
+//			checkConfig(configs);
 			
 		} catch (Exception e) {
 			logger.error("Error in Config class.");
@@ -51,19 +53,32 @@ public class Config {
 		return configs;
 	}
 	
-	private static void checkConfig(Map<String, String> properties) {
-		String host = properties.get("Host");
-		String port = properties.get("Port");
-		String dtProcessorExecPeriod = properties.get("DataProcessor_Execution_Period");
-		String lines = properties.get("MAX_Stats_Read_Line");
-		String directory = properties.get("File_Directory");
+	public void checkConfig() {
+		if (configs.isEmpty())
+			configs = getPropValues();
+		
+		String host = configs.get("Host");
+		String port = configs.get("Port");
+		String dtProcessorExecPeriod = configs.get("DataProcessor_Execution_Period");
+		String lines = configs.get("MAX_Stats_Read_Line");
+		String directory = configs.get("File_Directory");
+		String cacheEnabled = configs.get("Cache_Enable");
+		String cacheType = configs.get("Cache_Type");
+		String cacheTimeOut = configs.get("Cache_TimeOut");
+		String cacheCleanInterval = configs.get("Cache_Clean_Interval");
+		String cacheSize = configs.get("Cache_Size");
 		
 		logger.debug("********** config.properties *********");
 		logger.debug("Host :: " + host);
 		logger.debug("Port :: " + port);
 		logger.debug("DataProcessor_Execution_Period :: " + dtProcessorExecPeriod + "s");
 		logger.debug("MAX_Stats_Read_Line :: " + lines);
-		logger.debug("File_Directory :: " + directory);
+		logger.debug("File_Directory :: " + directory);		
+		logger.debug("Cache_Enable :: " + cacheEnabled);
+		logger.debug("Cache_Type :: " + cacheType);
+		logger.debug("Cache_TimeOut :: " + cacheTimeOut);
+		logger.debug("Cache_Clean_Interval :: " + cacheCleanInterval);
+		logger.debug("Cache_Size :: " + cacheSize);
 		logger.debug("********** config.properties *********");
 		
 		if (host.isEmpty())

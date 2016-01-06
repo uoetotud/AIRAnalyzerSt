@@ -44,17 +44,17 @@ public class LocalDbContainer implements IDbConnector {
 	private String cacheCleanInterval = properties.get("Cache_Clean_Interval");
 	private String cacheSize = properties.get("Cache_Size");
 	
-	private Cache<String, CacheItem> cache = null;
-	private boolean cacheIsEnabled = false;
+//	private Cache<String, CacheItem> cache = null;
+//	private boolean cacheIsEnabled = false;
 			
 	public LocalDbContainer() {
-		if (cacheEnabled.equalsIgnoreCase("true")) {
-			logger.info("Cache enabled.");
-			cache = new Cache<String, CacheItem>(cacheType, Long.parseLong(cacheTimeOut), Long.parseLong(cacheCleanInterval), Integer.parseInt(cacheSize));
-			cacheIsEnabled = true;
-		} else {
-			logger.info("Cache NOT enabled.");
-		}
+//		if (cacheEnabled.equalsIgnoreCase("true")) {
+//			logger.info("Cache enabled.");
+//			cache = new Cache<String, CacheItem>(cacheType, Long.parseLong(cacheTimeOut), Long.parseLong(cacheCleanInterval), Integer.parseInt(cacheSize));
+//			cacheIsEnabled = true;
+//		} else {
+//			logger.info("Cache NOT enabled.");
+//		}
 	}
 	
 	@Override
@@ -124,33 +124,6 @@ public class LocalDbContainer implements IDbConnector {
 		
 		LocalDbConference conference = null;
 		
-		/* NEW */
-		// Check cache
-		if (cacheIsEnabled == true) {
-			if (showAll) {
-				if (cache != null && cache.contains(confId)) {
-					conference = (LocalDbConference) cache.get(confId).getCacheObject();
-					
-					logger.info("Conference " + confId + " stats cached.");
-					
-					return conference;
-				} else {
-					logger.info("Conference " + confId + " stats NOT cached.");
-				}
-			} else {
-				if (cache != null && cache.contains(confId+"i")) {
-					conference = (LocalDbConference) cache.get(confId+"i").getCacheObject();
-					
-					logger.info("Conference " + confId + " info cached.");
-					
-					return conference;
-				} else {
-					logger.info("Conference " + confId + " info NOT cached.");
-				}
-			}
-		}
-		/* NEW */
-		
 		String folderPath = defaultPath + folder.get(0);
 		
 		// Get timestamp
@@ -178,16 +151,6 @@ public class LocalDbContainer implements IDbConnector {
 		
 		conference = new LocalDbConference(confId, timestamp, startTime, endTime, channels.size(), stats, score, channels);
 		
-		/* NEW */
-		if (cacheIsEnabled == true) {
-			if (showAll) {				
-				cache.put(confId, new CacheItem(conference, System.currentTimeMillis()));
-			} else {
-				cache.put(confId+"i", new CacheItem(conference, System.currentTimeMillis()));
-			}
-		}
-		/* NEW */
-		
 		return conference;
 	}
 	
@@ -200,7 +163,7 @@ public class LocalDbContainer implements IDbConnector {
 		
 		String confId = "";
 		
-		// if confId instead of folderPath is passed in
+		// if confId is passed in, convert to folderPath
 		if (folderPath.length() < 50) {
 			logger.trace("Received conference uuid to find conference channels, getting it's path...");
 			confId = folderPath;

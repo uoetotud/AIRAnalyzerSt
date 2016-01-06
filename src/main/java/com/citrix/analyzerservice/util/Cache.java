@@ -56,6 +56,16 @@ public class Cache<K, V> implements ICache<K, V> {
 			return null;
 		}
 		
+		return (V) cacheMap.get(key);
+	}
+	
+	@Override
+	public V fetch(K key) {
+		if (key == null) {
+			logger.error("Please provide a valid key.");
+			return null;
+		}
+		
 		CacheItem ci = (CacheItem) cacheMap.get(key);
 		
 		if (ci == null)

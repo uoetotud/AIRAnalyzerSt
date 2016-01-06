@@ -2,9 +2,6 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import dbconnector.TestLocalDbContainer;
-import util.TestCache;
-
 public class TestMain {
 
 	public static void main(String[] args) {
@@ -13,7 +10,10 @@ public class TestMain {
 //		testCache();
 		
 		// test LocalDbContainer
-		testLocalDbContainer();
+//		testLocalDbContainer();
+		
+		// test WsHandler
+		testWsHandler();
 
 	}
 
@@ -41,5 +41,18 @@ public class TestMain {
 		
 		System.out.println("Successful: " + result.wasSuccessful());
 		System.out.println("\n### End Test LocalDbContainer ###\n");
+	}
+	
+	private static void testWsHandler() {
+		System.out.println("=====================================================");
+		System.out.println("\n### Test WsHandler ###");
+		
+		Result result = JUnitCore.runClasses(TestWsHandler.class);
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+		
+		System.out.println("Successful: " + result.wasSuccessful());
+		System.out.println("\n### End Test WsHandler ###\n");
 	}
 }
