@@ -43,16 +43,8 @@ public class WsHandler {
 		
 		logger.info("Received getting conference list request.");
 		
-		List<LocalDbConference> conferenceList = dc.getConferenceList();
-				
+		List<LocalDbConference> conferenceList = dc.getConferenceList();				
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
-//		    @Override
-//		    public LocalDateTime deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-//		        Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
-//		        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-//		    }
-//		}).create();
 		
 		return gson.toJson(conferenceList);
 	}

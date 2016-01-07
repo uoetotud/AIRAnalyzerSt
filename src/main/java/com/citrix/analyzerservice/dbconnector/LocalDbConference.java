@@ -52,13 +52,13 @@ public class LocalDbConference {
 	public ConferenceStats getStats() {
 		return stats;
 	}
-	
-	public void setStats(ConferenceStats stats) {
-		this.stats = stats;
-	}
 
 	public ConferenceScore getScore() {
 		return score;
+	}
+	
+	public void setScore(ConferenceScore score) {
+		this.score = score;
 	}
 
 	public Collection<LocalDbChannel> getChannels() {

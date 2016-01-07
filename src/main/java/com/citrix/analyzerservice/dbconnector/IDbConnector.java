@@ -15,6 +15,7 @@ public interface IDbConnector {
 	LocalDbConference findConference(String confId, boolean showAll);
 	LocalDateTime findConferenceTimestamp(String folder);	
 	List<LocalDbChannel> findConfChannels(String folderPath);
+	List<String> getConfChannelIds(String path);
 	
 	LocalDbChannel findChannel(String confId, String chanId, boolean showAll);
 	ChannelStats findChannelStats(String confId, String chanId);

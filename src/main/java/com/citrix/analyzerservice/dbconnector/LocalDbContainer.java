@@ -126,8 +126,8 @@ public class LocalDbContainer implements IDbConnector {
 			score = new ConferenceScore(-1, -1);
 		}
 				
-		// Get conference channel IDs
-		List<LocalDbChannel> channels = findConfChannels(folderPath);
+		// Get conference channels
+		List<LocalDbChannel> channels = findConfChannels(confId);
 		
 		conference = new LocalDbConference(confId, timestamp, startTime, endTime, channels.size(), stats, score, channels);
 		
@@ -135,29 +135,14 @@ public class LocalDbContainer implements IDbConnector {
 	}
 	
 	@Override
-	public List<LocalDbChannel> findConfChannels(String folderPath) {
-		if (folderPath == null || folderPath.length() <= 0) {
-			logger.error("Please provide conference uuid or valid path.");
+	public List<LocalDbChannel> findConfChannels(String confId) {
+		if (confId == null || confId.length() <= 0) {
+			logger.error("Please provide a valid conference uuid.");
 			return null;
 		}
-		
-		String confId = "";
-		
-		// if confId is passed in, convert to folderPath
-		if (folderPath.length() < 50) {
-			logger.trace("Received conference uuid to find conference channels, getting it's path...");
-			confId = folderPath;
-			List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
-			if (folder.isEmpty()) {
-				logger.error("Cannot find conference " + confId + ".");
-				return null;
-			}
 			
-			folderPath = defaultPath + folder.get(0);
-		}
-		
 		List<LocalDbChannel> channels = new ArrayList<LocalDbChannel>();
-		List<String> channelIds = getConfChannelIds(folderPath);
+		List<String> channelIds = getConfChannelIds(confId);
 		
 		if (channelIds != null && !channelIds.isEmpty())
 			for (String channelId : channelIds) {
@@ -518,11 +503,18 @@ public class LocalDbContainer implements IDbConnector {
 		return convertedData;
 	}
 	
-	private List<String> getConfChannelIds(String path) {
+	@Override
+	public List<String> getConfChannelIds(String confId) {
 		List<String> channels = new ArrayList<String>();
 		
-		File folder = new File(path);
-		File[] fileLists = folder.listFiles();
+		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
+		if (folder.isEmpty()) {
+			logger.error("Cannot find conference " + confId + ".");
+			return null;
+		}
+		
+		File path = new File(defaultPath + folder.get(0));
+		File[] fileLists = path.listFiles();
 		
 		if (fileLists.length <= 0) {
 			logger.error("Cannot find channels in conference through " + path + ".");
@@ -608,7 +600,7 @@ public class LocalDbContainer implements IDbConnector {
 		
 		for (int i=0; i<allConfIds.size(); i++) {
 			String confId = allConfIds.get(i);
-			List<String> channelIds = getConfChannelIds(defaultPath + getFileNameFromId(defaultPath, confId, "folder").get(0));
+			List<String> channelIds = getConfChannelIds(confId);
 			for (String channelId : channelIds)
 				if (channelId.equals(chanId))
 					return confId;

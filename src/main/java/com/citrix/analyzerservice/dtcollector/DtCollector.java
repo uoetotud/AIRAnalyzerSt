@@ -27,7 +27,7 @@ public class DtCollector {
 	private static String cacheSize = configs.get("Cache_Size");
 	// End get configurations
 	
-	private static Cache<String, CacheItem> cache = null;
+	public static Cache<String, CacheItem> cache = null;
 	private static boolean cacheIsEnabled = false;
 	
 	// Create cache if enabled (put here to ensure ONLY ONCE execution)
@@ -45,12 +45,34 @@ public class DtCollector {
 	DbConnectorFactory dcf = new DbConnectorFactory();
 	IDbConnector ldc = dcf.getDbContainer("LOCAL");
 	
+	@SuppressWarnings("unchecked")
 	public List<LocalDbConference> getConferenceList() {
 		
-		List<LocalDbConference> conferenceList = ldc.findConferenceList();
-		
-		if (!conferenceList.isEmpty())
-			logger.info("Collected " + conferenceList.size() + " conferences.");
+		List<LocalDbConference> conferenceList = null;
+
+		if (cacheIsEnabled) {
+			String key = "ConferenceList";
+			if (cache != null && cache.contains(key)) {
+				logger.info("Conference list cached - return directly.");
+				
+				conferenceList = (List<LocalDbConference>) cache.fetch(key).getCacheObject();
+			} else {
+				logger.info("Conference list NOT cached.");
+				
+				conferenceList = ldc.findConferenceList();
+				if (conferenceList != null && !conferenceList.isEmpty()) {
+					logger.info("Collected " + conferenceList.size() + " conferences.");
+					cache.put(key, new CacheItem(conferenceList, System.currentTimeMillis()));
+				} else
+					logger.info("No channels found.");
+			}
+		} else {
+			conferenceList = ldc.findConferenceList();
+			if (conferenceList != null && !conferenceList.isEmpty())
+				logger.info("Collected " + conferenceList.size() + " conferences.");
+			else
+				logger.info("No channels found.");
+		}
 		
 		return conferenceList;
 	}

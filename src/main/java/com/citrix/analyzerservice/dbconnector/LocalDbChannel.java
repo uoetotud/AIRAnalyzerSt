@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ChannelStats;
+import com.citrix.analyzerservice.model.ConferenceScore;
 
 public class LocalDbChannel {
 
@@ -39,6 +40,10 @@ public class LocalDbChannel {
 
 	public ChannelScore getScore() {
 		return score;
+	}
+	
+	public void setScore(ChannelScore score) {
+		this.score = score;
 	}
 	
 }
