@@ -1,6 +1,5 @@
 package com.citrix.analyzerservice.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;

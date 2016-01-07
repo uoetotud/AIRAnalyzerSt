@@ -1,7 +1,6 @@
 package com.citrix.analyzerservice.dtprocessor;
 
 import java.util.List;
-import java.util.Map;
 
 import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ConferenceScore;

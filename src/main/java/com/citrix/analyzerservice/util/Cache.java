@@ -1,7 +1,5 @@
 package com.citrix.analyzerservice.util;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,6 +57,7 @@ public class Cache<K, V> implements ICache<K, V> {
 		return (V) cacheMap.get(key);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public V fetch(K key) {
 		if (key == null) {
@@ -66,7 +65,7 @@ public class Cache<K, V> implements ICache<K, V> {
 			return null;
 		}
 		
-		CacheItem ci = (CacheItem) cacheMap.get(key);
+		CacheItem<?> ci = (CacheItem<?>) cacheMap.get(key);
 		
 		if (ci == null)
 			return null;
@@ -131,23 +130,15 @@ public class Cache<K, V> implements ICache<K, V> {
 	@Override
 	public void cleanup() {
 		long time = System.currentTimeMillis();
-		List<K> keysToRemove = new ArrayList<K>();
 		K key = null;
-		CacheItem ci = null;
 		
 		for (Map.Entry<K, V> e : cacheMap.entrySet()) {
 			key = e.getKey();
-			ci = (CacheItem) e.getValue();
 			
-			if (ci != null && (time > (ci.getTimeStamp() + timeOut)))
-				keysToRemove.add(key);
-		}
-		
-		if (keysToRemove.size() > 0)
-			logger.info(keysToRemove.size() + " cache item expired.");
-		
-		for (K k : keysToRemove) {
-			cacheMap.remove(k);
+			if (time > (((CacheItem<?>) e.getValue()).getTimeStamp() + timeOut)) {
+				logger.warn("Cache " + key + " expired.");
+				cacheMap.remove(key);
+			}
 		}
 	}
 	
@@ -157,7 +148,7 @@ public class Cache<K, V> implements ICache<K, V> {
 		for (Map.Entry<K, V> e : cacheMap.entrySet()) {
 			tempKey = (K) e.getKey();
 			
-			if (lruKey == null || ((CacheItem) cacheMap.get(lruKey)).getTimeStamp() > ((CacheItem) e.getValue()).getTimeStamp())
+			if (lruKey == null || ((CacheItem<?>) cacheMap.get(lruKey)).getTimeStamp() > ((CacheItem<?>) e.getValue()).getTimeStamp())
 				lruKey = tempKey;
 		}
 		
@@ -170,7 +161,7 @@ public class Cache<K, V> implements ICache<K, V> {
 		for (Map.Entry<K, V> e : cacheMap.entrySet()) {
 			tempKey = (K) e.getKey();
 			
-			if (lfuKey == null || ((CacheItem) cacheMap.get(lfuKey)).getHitCount() > ((CacheItem) e.getValue()).getHitCount())
+			if (lfuKey == null || ((CacheItem<?>) cacheMap.get(lfuKey)).getHitCount() > ((CacheItem<?>) e.getValue()).getHitCount())
 				lfuKey = tempKey;
 		}
 		

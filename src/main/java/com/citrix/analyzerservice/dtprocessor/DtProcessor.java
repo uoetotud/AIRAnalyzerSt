@@ -1,8 +1,6 @@
 package com.citrix.analyzerservice.dtprocessor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
@@ -206,7 +204,9 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		// average channel-based speech and noise levels
 		// -----------------------------------------------------------------------------------------
 		/* overall results */
+		@SuppressWarnings("unused")
 		double avgSpeechLevel = 0;
+		@SuppressWarnings("unused")
 		double avgNoiseLevel = 0;
 		counter = 0;
 		

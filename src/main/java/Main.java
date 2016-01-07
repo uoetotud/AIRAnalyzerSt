@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
@@ -10,8 +9,6 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.citrix.analyzerservice.dtprocessor.DtProcessor;
-import com.citrix.analyzerservice.model.CacheItem;
-import com.citrix.analyzerservice.util.Cache;
 import com.citrix.analyzerservice.util.Config;
 
 public class Main {

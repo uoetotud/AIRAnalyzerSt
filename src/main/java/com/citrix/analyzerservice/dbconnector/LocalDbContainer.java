@@ -7,11 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +17,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.citrix.analyzerservice.model.CacheItem;
 import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ChannelStats;
 import com.citrix.analyzerservice.model.ConferenceScore;
@@ -27,7 +24,6 @@ import com.citrix.analyzerservice.model.ConferenceStats;
 import com.citrix.analyzerservice.model.Mixer;
 import com.citrix.analyzerservice.model.StreamEnhancer;
 import com.citrix.analyzerservice.model.StreamProcessor;
-import com.citrix.analyzerservice.util.Cache;
 import com.citrix.analyzerservice.util.Config;
 
 public class LocalDbContainer implements IDbConnector {
@@ -38,24 +34,8 @@ public class LocalDbContainer implements IDbConnector {
 	private Map<String, String> properties = new Config().getPropValues();
 	private String defaultPath = properties.get("File_Directory");	
 	private String maxStatsReadLine = properties.get("MAX_Stats_Read_Line");
-	private String cacheEnabled = properties.get("Cache_Enable");
-	private String cacheType = properties.get("Cache_Type");
-	private String cacheTimeOut = properties.get("Cache_TimeOut");
-	private String cacheCleanInterval = properties.get("Cache_Clean_Interval");
-	private String cacheSize = properties.get("Cache_Size");
-	
-//	private Cache<String, CacheItem> cache = null;
-//	private boolean cacheIsEnabled = false;
 			
-	public LocalDbContainer() {
-//		if (cacheEnabled.equalsIgnoreCase("true")) {
-//			logger.info("Cache enabled.");
-//			cache = new Cache<String, CacheItem>(cacheType, Long.parseLong(cacheTimeOut), Long.parseLong(cacheCleanInterval), Integer.parseInt(cacheSize));
-//			cacheIsEnabled = true;
-//		} else {
-//			logger.info("Cache NOT enabled.");
-//		}
-	}
+	public LocalDbContainer() {}
 	
 	@Override
 	public Map<String, List<String>> findUpdatedConfIds() {
@@ -179,19 +159,9 @@ public class LocalDbContainer implements IDbConnector {
 		List<LocalDbChannel> channels = new ArrayList<LocalDbChannel>();
 		List<String> channelIds = getConfChannelIds(folderPath);
 		
-		// Get startTime and endTime
-		LocalDateTime startTime = defaultTime;
-		LocalDateTime endTime = defaultTime;
-		
 		if (channelIds != null && !channelIds.isEmpty())
 			for (String channelId : channelIds) {
 				channels.add(findChannel(confId, channelId, false));
-	//			String chanId = channelIds.get(i);
-	//			
-	//			if (new File(defaultPath+"ChanList.txt").exists())
-	//				channels.add(new LocalDbChannel(chanId, startTime, endTime, null, getChannelScore(chanId)));
-	//			else
-	//				channels.add(new LocalDbChannel(chanId, startTime, endTime, null, null));
 			}
 		
 		return channels;
@@ -378,6 +348,7 @@ public class LocalDbContainer implements IDbConnector {
 					bw.write("[confId], [uuid], [avgPLIndicator], [avgLevelIndicator], [avgPacketLoss]");
 					bw.newLine();
 				} else {
+					bw.close();
 					return false;
 				}
 			}

@@ -3,7 +3,6 @@ package com.citrix.analyzerservice.dbconnector;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ConferenceScore;
 import com.citrix.analyzerservice.model.ConferenceStats;
 

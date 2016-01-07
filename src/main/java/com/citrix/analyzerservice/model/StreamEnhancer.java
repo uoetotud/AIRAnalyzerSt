@@ -10,10 +10,12 @@ public class StreamEnhancer {
 		this.NS_speechPowerOut = NS_noisePowerOut;
 	}
 
+	@SuppressWarnings("unused")
 	private double getNS_speechPowerOut() {
 		return NS_speechPowerOut;
 	}
 
+	@SuppressWarnings("unused")
 	private double getNS_noisePowerOut() {
 		return NS_noisePowerOut;
 	}
