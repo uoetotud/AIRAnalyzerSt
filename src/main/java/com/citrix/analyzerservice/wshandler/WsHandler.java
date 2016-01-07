@@ -2,6 +2,7 @@ package com.citrix.analyzerservice.wshandler;
 
 import java.util.List;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -23,27 +24,18 @@ public class WsHandler {
 	
 	private static final Logger logger = Logger.getLogger(WsHandler.class);
 	DtCollector dc = new DtCollector();
-
-	@GET
-	@Path("/greeting")
-	@Produces(MediaType.APPLICATION_JSON)
-	public String greeting(@QueryParam("name") String name) {
-		
-		String resp = "Hello " + name;
-		
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();		
-		
-		return gson.toJson(resp);
-	}
 	
 	@GET
 	@Path("/Conferences")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getConferenceList() {
+	public String getConferenceList(
+			@DefaultValue("all") @QueryParam("size") String size,
+			@DefaultValue("any") @QueryParam("from") String from,
+			@DefaultValue("any") @QueryParam("to") String to) {
 		
 		logger.info("Received getting conference list request.");
 		
-		List<LocalDbConference> conferenceList = dc.getConferenceList();				
+		List<LocalDbConference> conferenceList = dc.getConferenceList(size, from, to);				
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		return gson.toJson(conferenceList);

@@ -1,5 +1,7 @@
 package com.citrix.analyzerservice.dtcollector;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +48,7 @@ public class DtCollector {
 	IDbConnector ldc = dcf.getDbContainer("LOCAL");
 	
 	@SuppressWarnings("unchecked")
-	public List<LocalDbConference> getConferenceList() {
+	public List<LocalDbConference> getConferenceList(String size, String from, String to) {
 		
 		List<LocalDbConference> conferenceList = null;
 
@@ -72,6 +74,28 @@ public class DtCollector {
 				logger.info("Collected " + conferenceList.size() + " conferences.");
 			else
 				logger.info("No channels found.");
+		}
+		
+		// filter by size
+		if (!size.equalsIgnoreCase("all")) {
+			logger.info("Display " + Integer.parseInt(size) + " conferences.");
+			conferenceList = conferenceList.subList(0, Integer.parseInt(size));
+		}
+		
+		// filter by timestamp
+		if (!from.equalsIgnoreCase("any") || !to.equalsIgnoreCase("any")) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
+			LocalDateTime after = from.equalsIgnoreCase("any") ? null : LocalDateTime.parse(from, formatter);
+			LocalDateTime before = to.equalsIgnoreCase("any") ? null : LocalDateTime.parse(to, formatter);
+			logger.info("Display conferences from " + after + " to " + before + ".");
+			
+			for (LocalDbConference conference : conferenceList) {
+				LocalDateTime ldt = conference.getTimestamp();
+				if (after != null && ldt.isBefore(after))
+					conferenceList.remove(conference);
+				if (before != null && ldt.isAfter(before))
+					conferenceList.remove(conference);
+			}
 		}
 		
 		return conferenceList;
