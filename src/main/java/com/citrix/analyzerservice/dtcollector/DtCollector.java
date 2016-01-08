@@ -2,6 +2,7 @@ package com.citrix.analyzerservice.dtcollector;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -65,40 +66,25 @@ public class DtCollector {
 				if (conferenceList != null && !conferenceList.isEmpty()) {
 					logger.info("Collected " + conferenceList.size() + " conferences.");
 					cache.put(key, new CacheItem(conferenceList, System.currentTimeMillis()));
-				} else
+				} else {
 					logger.info("No channels found.");
+					return null;
+				}
 			}
 		} else {
 			conferenceList = ldc.findConferenceList();
 			if (conferenceList != null && !conferenceList.isEmpty())
 				logger.info("Collected " + conferenceList.size() + " conferences.");
-			else
+			else {
 				logger.info("No channels found.");
-		}
-		
-		// filter by size
-		if (!size.equalsIgnoreCase("all")) {
-			logger.info("Display " + Integer.parseInt(size) + " conferences.");
-			conferenceList = conferenceList.subList(0, Integer.parseInt(size));
-		}
-		
-		// filter by timestamp
-		if (!from.equalsIgnoreCase("any") || !to.equalsIgnoreCase("any")) {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
-			LocalDateTime after = from.equalsIgnoreCase("any") ? null : LocalDateTime.parse(from, formatter);
-			LocalDateTime before = to.equalsIgnoreCase("any") ? null : LocalDateTime.parse(to, formatter);
-			logger.info("Display conferences from " + after + " to " + before + ".");
-			
-			for (LocalDbConference conference : conferenceList) {
-				LocalDateTime ldt = conference.getTimestamp();
-				if (after != null && ldt.isBefore(after))
-					conferenceList.remove(conference);
-				if (before != null && ldt.isAfter(before))
-					conferenceList.remove(conference);
+				return null;
 			}
 		}
 		
-		return conferenceList;
+		if (size.equalsIgnoreCase("all") && from.equalsIgnoreCase("any") && to.equalsIgnoreCase("any"))		
+			return conferenceList;
+		else
+			return filter(conferenceList, size, from, to);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -249,4 +235,33 @@ public class DtCollector {
 		return channel;
 	}
 
+	private List<LocalDbConference> filter(List<LocalDbConference> confList, String size, String from, String to) {
+		List<LocalDbConference> subConfList = new LinkedList<LocalDbConference>();
+		LocalDbConference conf = null;
+		
+		int count = size.equalsIgnoreCase("all") ? confList.size() : Integer.parseInt(size);
+		if (count != confList.size())
+			logger.info("Display " + count + " conferences.");
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm");
+		LocalDateTime after = from.equalsIgnoreCase("any") ? null : LocalDateTime.parse(from, formatter);
+		LocalDateTime before = to.equalsIgnoreCase("any") ? null : LocalDateTime.parse(to, formatter);
+		if (after != null || before != null)
+			logger.info("Display conferences from " + from + " to " + to + ".");
+		
+		for (int i=0; i<confList.size(); i++) {
+			conf = confList.get(i);
+			
+			if ((after != null && conf.getTimestamp().isBefore(after)) || before != null && conf.getTimestamp().isAfter(before))
+				continue;
+			
+			if (subConfList.size() < count)
+				subConfList.add(conf);
+			else
+				break;
+		}
+		
+		return subConfList;
+	}
+	
 }

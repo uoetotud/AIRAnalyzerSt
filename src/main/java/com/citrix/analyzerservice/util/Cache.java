@@ -142,6 +142,12 @@ public class Cache<K, V> implements ICache<K, V> {
 		}
 	}
 	
+	@Override
+	public void clear() {
+		cacheMap.clear();
+		logger.warn("Cache cleared.");
+	}
+	
 	private K findLruKey() {
 		K lruKey = null, tempKey = null;
 		

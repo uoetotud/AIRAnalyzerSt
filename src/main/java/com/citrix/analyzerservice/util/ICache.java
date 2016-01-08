@@ -9,5 +9,6 @@ public interface ICache<K, V> {
 	boolean contains(K key);
 	int size();
 	void cleanup();
+	void clear();
 	
 }
