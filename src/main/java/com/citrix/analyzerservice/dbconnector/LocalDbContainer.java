@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.citrix.analyzerservice.Main;
 import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ChannelStats;
 import com.citrix.analyzerservice.model.ConferenceScore;
@@ -24,16 +25,14 @@ import com.citrix.analyzerservice.model.ConferenceStats;
 import com.citrix.analyzerservice.model.Mixer;
 import com.citrix.analyzerservice.model.StreamEnhancer;
 import com.citrix.analyzerservice.model.StreamProcessor;
-import com.citrix.analyzerservice.util.Config;
 
 public class LocalDbContainer implements IDbConnector {
 
 	private final Logger logger = Logger.getLogger(LocalDbContainer.class);
 	private LocalDateTime defaultTime = LocalDateTime.MIN;
 	
-	private Map<String, String> properties = new Config().getPropValues();
-	private String defaultPath = properties.get("File_Directory");	
-	private String maxStatsReadLine = properties.get("MAX_Stats_Read_Line");
+	private String defaultPath = Main.configs.get("File_Directory");	
+	private String maxStatsReadLine = Main.configs.get("MAX_Stats_Read_Line");
 			
 	public LocalDbContainer() {}
 	
@@ -164,7 +163,7 @@ public class LocalDbContainer implements IDbConnector {
 			logger.debug("Conference uuid not provided. Get it from channel uuid...");
 			confId = getChannelConference(chanId);
 			if (confId == null || confId.length() <= 0) {
-				logger.error("Conference does not exists.");
+				logger.error("Channel does not exists.");
 				return null;
 			}
 				

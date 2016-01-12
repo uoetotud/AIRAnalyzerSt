@@ -7,11 +7,11 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
+import com.citrix.analyzerservice.Main;
 import com.citrix.analyzerservice.dbconnector.DbConnectorFactory;
 import com.citrix.analyzerservice.dbconnector.IDbConnector;
 import com.citrix.analyzerservice.dbconnector.LocalDbChannel;
 import com.citrix.analyzerservice.dbconnector.LocalDbConference;
-import com.citrix.analyzerservice.dtcollector.DtCollector;
 import com.citrix.analyzerservice.model.CacheItem;
 import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ChannelStats;
@@ -40,23 +40,22 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 			logger.info("Data updated.");
 			
 			// remove conference list from cache
-			if (DtCollector.cache != null && DtCollector.cache.contains("ConferenceList")) {
+			if (Main.cache != null && Main.cache.contains("ConferenceList")) {
 				logger.info("Conference list in cache removed.");
-				DtCollector.cache.remove("ConferenceList");
+				Main.cache.remove("ConferenceList");
 			}
 			
 			logger.info("Start processing...");
 			
 			if (updatedConfIds.containsKey("newConfIds")) {
 				List<String> newConfIds = updatedConfIds.get("newConfIds");
-				logger.info("Found " + newConfIds.size() + " new conferences.");
+				logger.info("Found " + newConfIds.size() + " new conference(s) to process.");
 				
 				List<ConferenceScore> confScores = new ArrayList<ConferenceScore>();
 				ConferenceScore confScore = new ConferenceScore(0, 0);
 				
 				for (String newConfId : newConfIds) {
-					
-//					List<LocalDbChannel> channels = ldc.findConfChannels(newConfId);
+
 					List<String> channelIds = ldc.getConfChannelIds(newConfId);
 					List<ChannelScore> chanScores = new ArrayList<ChannelScore>();
 					
@@ -65,7 +64,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 						chanScores.add(chanScore);
 						
 						// update channel with new score in cache
-						if (DtCollector.cache != null && DtCollector.cache.size() > 0)
+						if (Main.cache != null && Main.cache.size() > 0)
 							updateChanScoreInCache(channelId, chanScore);
 					}
 					
@@ -77,7 +76,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 					confScores.add(confScore);
 					
 					// update conference with new score in cache
-					if (DtCollector.cache != null && DtCollector.cache.size() > 0)
+					if (Main.cache != null && Main.cache.size() > 0)
 						updateConfScoreInCache(newConfId, confScore);
 				}		
 				
@@ -93,7 +92,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 				for (String oldConfId : oldConfIds) {
 					
 					// remove conference (including its channels) from cache
-					if (DtCollector.cache != null && DtCollector.cache.size() > 0)
+					if (Main.cache != null && Main.cache.size() > 0)
 						removeConfernceFromCache(oldConfId);
 					
 					// update conference file & channel file
@@ -383,33 +382,33 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 	
 	private void removeConfernceFromCache(String oldConfId) {
 		// remove conference summary cache
-		if (DtCollector.cache.contains(oldConfId+"_summary")) {
-			DtCollector.cache.remove(oldConfId+"_summary");
+		if (Main.cache.contains(oldConfId+"_summary")) {
+			Main.cache.remove(oldConfId+"_summary");
 			logger.info(oldConfId + "_summary in cache removed.");
 		}
 		
 		// remove conference details cache
-		if (DtCollector.cache.contains(oldConfId+"_details")) {
-			DtCollector.cache.remove(oldConfId+"_details");
+		if (Main.cache.contains(oldConfId+"_details")) {
+			Main.cache.remove(oldConfId+"_details");
 			logger.info(oldConfId + "_details in cache removed.");
 		}
 		
 		// remove conference channels cache
-		if (DtCollector.cache.contains(oldConfId+"_channels")) {
-			DtCollector.cache.remove(oldConfId+"_channels");
+		if (Main.cache.contains(oldConfId+"_channels")) {
+			Main.cache.remove(oldConfId+"_channels");
 			logger.info(oldConfId + "_channels in cache removed.");
 		}
 		
 		// remove each channel cache of this conference
 		List<String> channelIds = ldc.getConfChannelIds(oldConfId);
 		for (String channelId : channelIds) {
-			if (DtCollector.cache.contains(channelId+"_summary")) {
-				DtCollector.cache.remove(channelId+"_summary");
+			if (Main.cache.contains(channelId+"_summary")) {
+				Main.cache.remove(channelId+"_summary");
 				logger.info(channelId + "_summary in cache removed.");
 			}
 			
-			if (DtCollector.cache.contains(channelId+"_details")) {
-				DtCollector.cache.remove(channelId+"_details");
+			if (Main.cache.contains(channelId+"_details")) {
+				Main.cache.remove(channelId+"_details");
 				logger.info(channelId + "_details in cache removed.");
 			}
 		}
@@ -417,28 +416,28 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 	
 	private void updateConfScoreInCache(String confId, ConferenceScore confScore) {
 		// update conference summary cache with new score
-		if (DtCollector.cache.contains(confId + "_summary")) {
-			((LocalDbConference) ((CacheItem<?>) DtCollector.cache.get(confId + "_summary")).getCacheObject()).setScore(confScore);
+		if (Main.cache.contains(confId + "_summary")) {
+			((LocalDbConference) ((CacheItem<?>) Main.cache.get(confId + "_summary")).getCacheObject()).setScore(confScore);
 			logger.info(confId + "_summary in cache score updated.");
 		}
 		
 		// update conference details cache with new score
-		if (DtCollector.cache.contains(confId + "_details")) {
-			((LocalDbConference) ((CacheItem<?>) DtCollector.cache.get(confId + "_details")).getCacheObject()).setScore(confScore);
+		if (Main.cache.contains(confId + "_details")) {
+			((LocalDbConference) ((CacheItem<?>) Main.cache.get(confId + "_details")).getCacheObject()).setScore(confScore);
 			logger.info(confId + "_details in cache score updated.");
 		}
 	}
 	
 	private void updateChanScoreInCache(String channelId, ChannelScore chanScore) {
 		// update channel summary cache with new score
-		if (DtCollector.cache.contains(channelId + "_summary")) {
-			((LocalDbChannel) ((CacheItem<?>) DtCollector.cache.get(channelId + "_summary")).getCacheObject()).setScore(chanScore);
+		if (Main.cache.contains(channelId + "_summary")) {
+			((LocalDbChannel) ((CacheItem<?>) Main.cache.get(channelId + "_summary")).getCacheObject()).setScore(chanScore);
 			logger.info(channelId + "_summary in cache score updated.");
 		}
 		
 		// update channel details cache with new score
-		if (DtCollector.cache.contains(channelId + "_details")) {
-			((LocalDbChannel) ((CacheItem<?>) DtCollector.cache.get(channelId + "_details")).getCacheObject()).setScore(chanScore);
+		if (Main.cache.contains(channelId + "_details")) {
+			((LocalDbChannel) ((CacheItem<?>) Main.cache.get(channelId + "_details")).getCacheObject()).setScore(chanScore);
 			logger.info(channelId + "_details in cache score updated.");
 		}
 	}

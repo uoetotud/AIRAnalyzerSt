@@ -58,17 +58,4 @@ public class TestMain {
 		System.out.println("Successful: " + result.wasSuccessful());
 		System.out.println("\n### End Test DtCollector ###\n");
 	}
-	
-	private static void testWsHandler() {
-		System.out.println("=====================================================");
-		System.out.println("\n### Test WsHandler ###");
-		
-		Result result = JUnitCore.runClasses(TestWsHandler.class);
-		for (Failure failure : result.getFailures()) {
-			System.out.println(failure.toString());
-		}
-		
-		System.out.println("Successful: " + result.wasSuccessful());
-		System.out.println("\n### End Test WsHandler ###\n");
-	}
 }

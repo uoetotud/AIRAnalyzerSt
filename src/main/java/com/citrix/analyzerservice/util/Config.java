@@ -37,8 +37,6 @@ public class Config {
 				configs.put(key, prop.getProperty(key));
 			}
 			
-//			checkConfig(configs);
-			
 		} catch (Exception e) {
 			logger.error("Error in Config class.");
 		} finally {

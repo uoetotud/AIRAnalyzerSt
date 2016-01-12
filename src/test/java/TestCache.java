@@ -1,26 +1,49 @@
-
-
 import static org.junit.Assert.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.citrix.analyzerservice.model.CacheItem;
 import com.citrix.analyzerservice.util.Cache;
 
 public class TestCache {
-
-	public TestCache() {}
 	
+	@SuppressWarnings("rawtypes")
+	static Cache<String, CacheItem> cache = null;
+
+	@BeforeClass
+	public static void oneTimeSetUp() {
+		System.out.println("=====================================================");
+		System.out.println("### Test Cache ###");
+	}
+
+	@AfterClass
+	public static void oneTimeTearDown() {
+		System.out.println("\n### End Test Cache ###");
+		System.out.println("=====================================================");
+	}
+	
+	@Before
+	public void setUp() {}
+
+	@After
+	public void tearDown() {
+		cache = null;
+		System.out.println("-----------------------------------------------------");
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
-//	@Ignore
 	public void testGetPutRemoveContainsSizeFunctions() throws InterruptedException {
-		System.out.println("\n***** Test Get/Put/Remove/Contains/Size functions *****\n");
-		Cache<String, CacheItem> cache = new Cache<String, CacheItem>("LRU", 10, 10, 5);
+		System.out.println("\n** Test Get/Put/Remove/Contains/Size functions **");
+		cache = new Cache<String, CacheItem>("LRU", 10, 10, 5);
 		assertEquals(cache.size(), 0);
 		
 		// Item 1, 2, 3 added
@@ -54,15 +77,13 @@ public class TestCache {
 		assertEquals(cache.size(), 5);
 		assertTrue(cache.contains("key6"));
 		System.out.println("1 cache items added. Cache size: " + cache.size());
-		
-		System.out.println("-----------------------------------------------------\n");
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	@Ignore
 	public void testCacheItemExpire() throws InterruptedException {
-		System.out.println("\n***** Test cache item expires *****\n");
-		Cache<String, CacheItem> cache = new Cache<String, CacheItem>("LRU", 2, 3, 5);
+		System.out.println("\n** Test cache item expires **");
+		cache = new Cache<String, CacheItem>("LRU", 2, 3, 5);
 		
 		// Item 1, 2 added
 		cache.put("key1", new CacheItem("value1", System.currentTimeMillis()));
@@ -74,15 +95,13 @@ public class TestCache {
 		Thread.sleep(5000);
 		assertEquals(cache.size(), 0);
 		System.out.println("Cache size: " + cache.size());
-		
-		System.out.println("-----------------------------------------------------\n");
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	@Ignore
 	public void testLruCache() throws InterruptedException {
-		System.out.println("\n***** Test LRU cache *****\n");
-		Cache<String, CacheItem> cache = new Cache<String, CacheItem>("LRU", 10, 5, 3);
+		System.out.println("\n** Test LRU cache **");
+		cache = new Cache<String, CacheItem>("LRU", 10, 5, 3);
 		
 		// Item 1, 2, 3 added
 		cache.put("key1", new CacheItem("value1", System.currentTimeMillis()));
@@ -92,52 +111,53 @@ public class TestCache {
 		System.out.println(cache.size() + " cache items added.");
 		
 		// Timestamp of item 1, 2, 3 updated
-		CacheItem ci2 = (CacheItem) cache.get("key2");
+		CacheItem ci2 = (CacheItem) cache.fetch("key2");
 		assertNotNull(ci2);
-		System.out.println("'key2' cache item accessed.");
+		System.out.println("'key2' cache item accessed, timestamp: " + ci2.getTimeStamp());
 		
-		Thread.sleep(2000);
-		CacheItem ci1 = (CacheItem) cache.get("key1");
+		Thread.sleep(1000);
+		CacheItem ci1 = (CacheItem) cache.fetch("key1");
 		assertNotNull(ci1);
-		System.out.println("'key1' cache item accessed.");
+		System.out.println("'key1' cache item accessed, timestamp: " + ci1.getTimeStamp());
 		
-		Thread.sleep(2000);
-		CacheItem ci3 = (CacheItem) cache.get("key3");
+		Thread.sleep(1000);
+		CacheItem ci3 = (CacheItem) cache.fetch("key3");
 		assertNotNull(ci3);
-		System.out.println("'key3' cache item accessed.");
+		System.out.println("'key3' cache item accessed, timestamp: " + ci3.getTimeStamp());
 		
 		assertTrue(ci3.getTimeStamp() > ci1.getTimeStamp());
 		assertTrue(ci1.getTimeStamp() > ci2.getTimeStamp());
 		
 		// Item 4 added - replace item 2
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 		cache.put("key4", new CacheItem("value4", System.currentTimeMillis()));
 		assertEquals(cache.size(), 3);
+		System.out.println("'key4' cache item added.");
 
-		CacheItem ci4 = (CacheItem) cache.get("key4");
+		CacheItem ci4 = (CacheItem) cache.fetch("key4");
 		assertNotNull(ci4);
+		System.out.println("'key4' cache item accessed, timestamp: " + ci4.getTimeStamp());
 		ci2 = (CacheItem) cache.get("key2");
 		assertNull(ci2);
-		System.out.println("Cache size: " + cache.size());
 		
 		// Item 5 added - replace item 1
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 		cache.put("key5", new CacheItem("value5", System.currentTimeMillis()));
 		assertEquals(cache.size(), 3);
-		CacheItem ci5 = (CacheItem) cache.get("key5");
+		System.out.println("'key4' cache item added.");
+		
+		CacheItem ci5 = (CacheItem) cache.fetch("key5");
 		assertNotNull(ci5);
+		System.out.println("'key5' cache item accessed, timestamp: " + ci5.getTimeStamp());
 		ci1 = (CacheItem) cache.get("key1");
 		assertNull(ci1);
-		System.out.println("Cache size: " + cache.size());
-		
-		System.out.println("-----------------------------------------------------\n");
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
-	@Ignore
 	public void testLfuCache() throws InterruptedException {
-		System.out.println("\n***** Test LFU cache *****\n");
-		Cache<String, CacheItem> cache = new Cache<String, CacheItem>("LFU", 15, 5, 3);
+		System.out.println("\n** Test LFU cache **");
+		cache = new Cache<String, CacheItem>("LFU", 15, 5, 3);
 		
 		// Item 1, 2, 3 added
 		cache.put("key1", new CacheItem("value1", System.currentTimeMillis()));
@@ -147,56 +167,59 @@ public class TestCache {
 		System.out.println(cache.size() + " cache items added.");
 		
 		// HitCount of item 1, 2, 3 updated
-		CacheItem ci2 = (CacheItem) cache.get("key2");
+		CacheItem ci2 = (CacheItem) cache.fetch("key2");
 		assertNotNull(ci2);
-		assertEquals(ci2.getHitCount(), 1);
-		System.out.println("'key2' cache item accessed.");
+		assertEquals(ci2.getHitCount(), 2);
+		System.out.println("'key2' cache item accessed, hitCount: " + ci2.getHitCount());
 		
 		int i = 0;
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 		CacheItem ci1 = null;
-		for (i=0; i<2; i++)
-			ci1 = (CacheItem) cache.get("key1");
+		for (i=0; i<2; i++) {
+			ci1 = (CacheItem) cache.fetch("key1");
+			System.out.println("'key1' cache item accessed, hitCount: " + ci1.getHitCount());
+		}
 		assertNotNull(ci1);
-		assertEquals(ci1.getHitCount(), 2);
-		System.out.println("'key1' cache item accessed twice.");
+		assertEquals(ci1.getHitCount(), 3);
 		
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 		CacheItem ci3 = null;
-		for (i=0; i<3; i++)
-			ci3 = (CacheItem) cache.get("key3");
+		for (i=0; i<3; i++) {
+			ci3 = (CacheItem) cache.fetch("key3");
+			System.out.println("'key3' cache item accessed, hitCount: " + ci3.getHitCount());
+		}
 		assertNotNull(ci3);
-		assertEquals(ci3.getHitCount(), 3);
-		System.out.println("'key3' cache item accessed triple times.");
+		assertEquals(ci3.getHitCount(), 4);
 
 		// Item 4 added - replace item 2
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 		cache.put("key4", new CacheItem("value4", System.currentTimeMillis()));
 		assertEquals(cache.size(), 3);
+		System.out.println("'key4' cache item added.");
 
-		CacheItem ci4 = (CacheItem) cache.get("key4");
+		CacheItem ci4 = (CacheItem) cache.fetch("key4");
 		assertNotNull(ci4);
+		System.out.println("'key4' cache item accessed, hitCount: " + ci4.getHitCount());
 		ci2 = (CacheItem) cache.get("key2");
 		assertNull(ci2);
-		System.out.println("Cache size: " + cache.size());
 		
 		// Item 5 added - replace item 4
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 		cache.put("key5", new CacheItem("value5", System.currentTimeMillis()));
 		assertEquals(cache.size(), 3);
-		CacheItem ci5 = (CacheItem) cache.get("key5");
+		System.out.println("'key5' cache item added.");
+		
+		CacheItem ci5 = (CacheItem) cache.fetch("key5");
 		assertNotNull(ci5);
+		System.out.println("'key5' cache item accessed, hitCount: " + ci5.getHitCount());
 		ci4 = (CacheItem) cache.get("key4");
 		assertNull(ci4);
-		System.out.println("Cache size: " + cache.size());
-		
-		System.out.println("-----------------------------------------------------\n");
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 	@Test
-	@Ignore
 	public void testConcurrency() throws InterruptedException {
-		System.out.println("\n***** Test concurrency support *****\n");
+		System.out.println("\n** Test concurrency support **");
 		
 		System.out.println("Test 1000000 cache items with 1 thread.");
 		Cache<String, CacheItem> cache1 = new Cache<String, CacheItem>("LRU", 10, 10, 1000000);
@@ -235,7 +258,5 @@ public class TestCache {
 		System.out.println("Execution time using 10 threads: " + time2 + " ms.");
 		System.out.println("\nNOTE: this test is only for concurrency support, not performance."
 				+ " Multi-thread may be slower than single thread because of overhead.");
-		
-		System.out.println("-----------------------------------------------------\n");		
 	}
 }

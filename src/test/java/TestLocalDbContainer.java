@@ -1,8 +1,6 @@
-
-
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -13,71 +11,93 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.citrix.analyzerservice.Main;
 import com.citrix.analyzerservice.dbconnector.DbConnectorFactory;
 import com.citrix.analyzerservice.dbconnector.IDbConnector;
 import com.citrix.analyzerservice.dbconnector.LocalDbConference;
-import com.citrix.analyzerservice.dbconnector.LocalDbContainer;
 import com.citrix.analyzerservice.dtprocessor.DtProcessor;
-import com.citrix.analyzerservice.util.Config;
 
 public class TestLocalDbContainer {
 	
 	DbConnectorFactory dcf = new DbConnectorFactory();
 	IDbConnector ldc = dcf.getDbContainer("LOCAL");
-
-	static Map<String, String> configs = new Config().getPropValues();
+	
 	Map<String, List<String>> updatedConfIds;
 	
-//	@BeforeClass
-//	public static void oneTimeSetUp() throws Exception {
-//		config = new Config();
-//		configs = config.getPropValues();
-//	}
-//
-//	@AfterClass
-//	public static void oneTimeTearDown() throws Exception {
-//		config = null;
-//		configs.clear();
-//	}
-//
-//	@Before
-//	public void setUp() {
-//		
-//	}
-//
-//	@After
-//	public void tearDown() {
-//		updatedConfIds.clear();
-//	}
+	@BeforeClass
+	public static void oneTimeSetUp() {
+		System.out.println("=====================================================");
+		System.out.println("### Test LocalDbContainer ###");
+	}
 
-	@Test
-	@Ignore
-	public void testFindNewConfIds() {
-		updatedConfIds = ldc.findUpdatedConfIds();
-		assertNotNull(updatedConfIds.get("newConfIds"));
-		assertFalse(updatedConfIds.get("newConfIds").isEmpty());
+	@AfterClass
+	public static void oneTimeTearDown() {
+		System.out.println("\n### End Test LocalDbContainer ###");
+		System.out.println("=====================================================");
 	}
 	
-	@Test
-	@Ignore
-	public void testFindNoNewConfIds() {		
-		updatedConfIds = ldc.findUpdatedConfIds();
-		assertNull(updatedConfIds.get("newConfIds"));
+	@Before
+	public void setUp() {}
+
+	@After
+	public void tearDown() {
+		System.out.println("-----------------------------------------------------");
 	}
-	
+
+	/*
+	 * Pre-condition: folder has conference 0, 1, 2, but none is processed
+	 * Post-condition: folder has conference 0, 1, and both are processed
+	 * */
 	@Test
-	@Ignore
-	public void testFindOldConfIds() {		
+	public void testFindUpdatedConfIds() throws InterruptedException {
+		System.out.println("\n** Get updated conference IDs **");
+		
+		/* test conferences added */
+		// get new confIds before processing
 		updatedConfIds = ldc.findUpdatedConfIds();
-		assertNotNull(updatedConfIds.get("oldConfIds"));
-		assertFalse(updatedConfIds.get("oldConfIds").isEmpty());
-	}
-	
-	@Test
-	@Ignore
-	public void testFindNoOldConfIds() {		
+		int size = updatedConfIds.get("newConfIds").size();
+		assertEquals(size, 3);
+		System.out.println("Found " + size + " new conference(s):");
+		for (int i=0; i<size; i++)
+			System.out.println(updatedConfIds.get("newConfIds").get(i));
+		
+		// invoke processor to calculate these conferences
+		DtProcessor dp = new DtProcessor();
+		dp.run();
+		
+		// get new confIds again
 		updatedConfIds = ldc.findUpdatedConfIds();
-		assertNull(updatedConfIds.get("oldConfIds"));
+		assertFalse(updatedConfIds.containsKey("newConfIds"));
+		System.out.println("Found no new conference(s).");
+		
+		/* test conferences removed */
+		System.out.println("\nNow remove conference 22222222-2222-2222-2222222222222222...");
+		
+		// remove conference
+		String path = Main.configs.get("File_Directory") + "150508-092531-conference_22222222-2222-2222-2222222222222222";
+		File oldConf = new File(path);
+		String[] files = oldConf.list();
+		for (String f : files) {
+			File currentFile = new File(oldConf, f);
+			currentFile.delete();
+		}
+		oldConf.delete();
+		System.out.println("Removed. Check again...");
+		
+		// get new confIds before processing
+		updatedConfIds = ldc.findUpdatedConfIds();
+		size = updatedConfIds.get("oldConfIds").size();
+		assertEquals(size, 1);
+		System.out.println("Found " + size + " removed conference(s): " + updatedConfIds.get("oldConfIds").get(0));
+		
+		// invoke processor to update list files
+		dp.run();
+		
+		// get updated confIds again
+		updatedConfIds = ldc.findUpdatedConfIds();
+		assertFalse(updatedConfIds.containsKey("newConfIds"));
+		assertFalse(updatedConfIds.containsKey("oldConfIds"));
+		System.out.println("Found no updated conference(s).");
 	}
 	
 	/*
@@ -90,7 +110,7 @@ public class TestLocalDbContainer {
 	public void testFindConference() {
 		System.out.println("\n***** Test find conference *****\n");
 		
-		if (configs.get("Cache_Enable").equalsIgnoreCase("false")) {
+		if (Main.configs.get("Cache_Enable").equalsIgnoreCase("false")) {
 			
 			System.out.println("Get conference 00000000-0000-0000-0000000000000000 info.");
 			LocalDbConference conferenceExists = ldc.findConference("00000000-0000-0000-0000000000000000", false);
@@ -120,7 +140,7 @@ public class TestLocalDbContainer {
 			assertNull(conferenceNotExists);
 			System.out.println("Not found.");
 			
-		} else if (configs.get("Cache_Enable").equalsIgnoreCase("true")) {
+		} else if (Main.configs.get("Cache_Enable").equalsIgnoreCase("true")) {
 			
 			System.out.println("Get conference 00000000-0000-0000-0000000000000000 info.");
 			LocalDbConference conferenceExists = ldc.findConference("00000000-0000-0000-0000000000000000", false);
@@ -210,6 +230,7 @@ public class TestLocalDbContainer {
 	 * 		2. Cache is enabled with type = LFU, size = 3
 	 * */
 	@Test
+	@Ignore
 	public void testFindConferenceInLfu() {		
 		System.out.println("\n***** Test find conference in LFU *****\n");
 		
