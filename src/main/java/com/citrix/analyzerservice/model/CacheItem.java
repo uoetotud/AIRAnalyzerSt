@@ -3,12 +3,14 @@ package com.citrix.analyzerservice.model;
 public class CacheItem<V> {
 
 	private V cacheObject;
-	private long timeStamp; // for LRU
+	private long timeStamp; 
+	private long lastAccessed; // for LRU
 	private int hitCount; // for LFU
 	
 	public CacheItem(V cacheObject, long timeStamp) {
 		this.cacheObject = cacheObject;
 		this.timeStamp = timeStamp;
+		this.lastAccessed = timeStamp;
 		this.hitCount = 1;
 	}
 	
@@ -19,9 +21,13 @@ public class CacheItem<V> {
 	public long getTimeStamp() {
 		return timeStamp;
 	}
+	
+	public long getLastAccessed() {
+		return lastAccessed;
+	}
 
-	public void setTimeStamp(long timeStamp) {
-		this.timeStamp = timeStamp;
+	public void setLastAccessed(long lastAccessed) {
+		this.lastAccessed = lastAccessed;
 	}
 
 	public int getHitCount() {

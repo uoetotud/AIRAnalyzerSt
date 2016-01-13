@@ -26,7 +26,7 @@ public class Cache<K, V> implements ICache<K, V> {
 				"s; CleanInterval: " + cleanInterval/1000 + "s)");
 		
 		this.type = type;
-		this.timeOut = timeOut * 1000;
+		this.timeOut = timeOut;
 		this.maxSize = maxSize;
 		cacheMap = new ConcurrentHashMap<K, V>(maxSize);
 		
@@ -34,7 +34,7 @@ public class Cache<K, V> implements ICache<K, V> {
 			public void run() {
 				while (true) {
 					try {
-						Thread.sleep(cleanInterval * 1000);
+						Thread.sleep(cleanInterval);
 					} catch (InterruptedException e) {
 						logger.error("Thread for waiting to clean up cache interrupted.");
 					}
@@ -71,7 +71,7 @@ public class Cache<K, V> implements ICache<K, V> {
 		if (ci == null)
 			return null;
 		else {
-			ci.setTimeStamp(System.currentTimeMillis());
+			ci.setLastAccessed(System.currentTimeMillis());
 			ci.setHitCount(ci.getHitCount() + 1);
 			return (V) ci;
 		}
@@ -155,7 +155,7 @@ public class Cache<K, V> implements ICache<K, V> {
 		for (Map.Entry<K, V> e : cacheMap.entrySet()) {
 			tempKey = (K) e.getKey();
 			
-			if (lruKey == null || ((CacheItem<?>) cacheMap.get(lruKey)).getTimeStamp() > ((CacheItem<?>) e.getValue()).getTimeStamp())
+			if (lruKey == null || ((CacheItem<?>) cacheMap.get(lruKey)).getLastAccessed() > ((CacheItem<?>) e.getValue()).getLastAccessed())
 				lruKey = tempKey;
 		}
 		

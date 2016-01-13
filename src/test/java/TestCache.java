@@ -35,7 +35,7 @@ public class TestCache {
 
 	@After
 	public void tearDown() {
-		cache = null;
+		cache.clear();
 		System.out.println("-----------------------------------------------------");
 	}
 	
@@ -43,7 +43,7 @@ public class TestCache {
 	@Test
 	public void testGetPutRemoveContainsSizeFunctions() throws InterruptedException {
 		System.out.println("\n** Test Get/Put/Remove/Contains/Size functions **");
-		cache = new Cache<String, CacheItem>("LRU", 10, 10, 5);
+		cache = new Cache<String, CacheItem>("LRU", 10000, 10000, 5);
 		assertEquals(cache.size(), 0);
 		
 		// Item 1, 2, 3 added
@@ -83,7 +83,7 @@ public class TestCache {
 	@Test
 	public void testCacheItemExpire() throws InterruptedException {
 		System.out.println("\n** Test cache item expires **");
-		cache = new Cache<String, CacheItem>("LRU", 2, 3, 5);
+		cache = new Cache<String, CacheItem>("LRU", 2000, 3000, 5);
 		
 		// Item 1, 2 added
 		cache.put("key1", new CacheItem("value1", System.currentTimeMillis()));
@@ -91,8 +91,10 @@ public class TestCache {
 		assertEquals(cache.size(), 2);
 		System.out.println(cache.size() + " cache items added.");
 		
-		// Item 1, 2 expired
+		// wait for 5s
 		Thread.sleep(5000);
+
+		// Item 1, 2 expired
 		assertEquals(cache.size(), 0);
 		System.out.println("Cache size: " + cache.size());
 	}
@@ -101,7 +103,7 @@ public class TestCache {
 	@Test
 	public void testLruCache() throws InterruptedException {
 		System.out.println("\n** Test LRU cache **");
-		cache = new Cache<String, CacheItem>("LRU", 10, 5, 3);
+		cache = new Cache<String, CacheItem>("LRU", 10000, 5000, 3);
 		
 		// Item 1, 2, 3 added
 		cache.put("key1", new CacheItem("value1", System.currentTimeMillis()));
@@ -113,20 +115,20 @@ public class TestCache {
 		// Timestamp of item 1, 2, 3 updated
 		CacheItem ci2 = (CacheItem) cache.fetch("key2");
 		assertNotNull(ci2);
-		System.out.println("'key2' cache item accessed, timestamp: " + ci2.getTimeStamp());
+		System.out.println("'key2' cache item accessed at: " + ci2.getLastAccessed());
 		
 		Thread.sleep(1000);
 		CacheItem ci1 = (CacheItem) cache.fetch("key1");
 		assertNotNull(ci1);
-		System.out.println("'key1' cache item accessed, timestamp: " + ci1.getTimeStamp());
+		System.out.println("'key1' cache item accessed at: " + ci1.getLastAccessed());
 		
 		Thread.sleep(1000);
 		CacheItem ci3 = (CacheItem) cache.fetch("key3");
 		assertNotNull(ci3);
-		System.out.println("'key3' cache item accessed, timestamp: " + ci3.getTimeStamp());
+		System.out.println("'key3' cache item accessed at: " + ci3.getLastAccessed());
 		
-		assertTrue(ci3.getTimeStamp() > ci1.getTimeStamp());
-		assertTrue(ci1.getTimeStamp() > ci2.getTimeStamp());
+		assertTrue(ci3.getLastAccessed() > ci1.getLastAccessed());
+		assertTrue(ci1.getLastAccessed() > ci2.getLastAccessed());
 		
 		// Item 4 added - replace item 2
 		Thread.sleep(1000);
@@ -136,7 +138,7 @@ public class TestCache {
 
 		CacheItem ci4 = (CacheItem) cache.fetch("key4");
 		assertNotNull(ci4);
-		System.out.println("'key4' cache item accessed, timestamp: " + ci4.getTimeStamp());
+		System.out.println("'key4' cache item accessed at: " + ci4.getLastAccessed());
 		ci2 = (CacheItem) cache.get("key2");
 		assertNull(ci2);
 		
@@ -148,7 +150,7 @@ public class TestCache {
 		
 		CacheItem ci5 = (CacheItem) cache.fetch("key5");
 		assertNotNull(ci5);
-		System.out.println("'key5' cache item accessed, timestamp: " + ci5.getTimeStamp());
+		System.out.println("'key5' cache item accessed at: " + ci5.getLastAccessed());
 		ci1 = (CacheItem) cache.get("key1");
 		assertNull(ci1);
 	}
@@ -157,7 +159,7 @@ public class TestCache {
 	@Test
 	public void testLfuCache() throws InterruptedException {
 		System.out.println("\n** Test LFU cache **");
-		cache = new Cache<String, CacheItem>("LFU", 15, 5, 3);
+		cache = new Cache<String, CacheItem>("LFU", 15000, 5000, 3);
 		
 		// Item 1, 2, 3 added
 		cache.put("key1", new CacheItem("value1", System.currentTimeMillis()));
@@ -222,7 +224,7 @@ public class TestCache {
 		System.out.println("\n** Test concurrency support **");
 		
 		System.out.println("Test 1000000 cache items with 1 thread.");
-		Cache<String, CacheItem> cache1 = new Cache<String, CacheItem>("LRU", 10, 10, 1000000);
+		Cache<String, CacheItem> cache1 = new Cache<String, CacheItem>("LRU", 10000, 10000, 1000000);
 		long startTime1 = System.nanoTime();
 		for (int i=0; i<1000000; i++) {
 			Integer no = (int) Math.ceil(Math.random() * 5500000);
@@ -234,7 +236,7 @@ public class TestCache {
 		long time1 = (endTime1 - startTime1) / 1000000L;
 		
 		System.out.println("Test 1000000 cache items with 10 threads.");
-		Cache<String, CacheItem> cache2 = new Cache<String, CacheItem>("LRU", 10, 10, 1000000);		
+		Cache<String, CacheItem> cache2 = new Cache<String, CacheItem>("LRU", 10000, 10000, 1000000);		
 		ExecutorService es = Executors.newFixedThreadPool(10);
 		long startTime2 = System.nanoTime();
 		for (int i=0; i<10; i++) {
