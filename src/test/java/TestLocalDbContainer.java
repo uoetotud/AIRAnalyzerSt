@@ -8,13 +8,11 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.citrix.analyzerservice.Main;
 import com.citrix.analyzerservice.dbconnector.DbConnectorFactory;
 import com.citrix.analyzerservice.dbconnector.IDbConnector;
-import com.citrix.analyzerservice.dbconnector.LocalDbConference;
 import com.citrix.analyzerservice.dtprocessor.DtProcessor;
 
 public class TestLocalDbContainer {

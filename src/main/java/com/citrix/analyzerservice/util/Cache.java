@@ -22,7 +22,8 @@ public class Cache<K, V> implements ICache<K, V> {
 			logger.warn("Cache type not specified or invalid - use default type: LRU.");
 		}
 		
-		logger.info("New " + type + " cache created (MaxSize: " + maxSize + "; TimeOut: " + timeOut + "s; CleanInterval: " + cleanInterval + "s)");
+		logger.info("New " + type + " cache created (MaxSize: " + maxSize + "; TimeOut: " + timeOut/1000 + 
+				"s; CleanInterval: " + cleanInterval/1000 + "s)");
 		
 		this.type = type;
 		this.timeOut = timeOut * 1000;
