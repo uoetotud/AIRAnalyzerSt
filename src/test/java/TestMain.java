@@ -7,16 +7,13 @@ public class TestMain {
 	public static void main(String[] args) {
 		
 		// test Cache
-//		testCache();
+		testCache();
 		
 		// test LocalDbContainer
-//		testLocalDbContainer();
+		testLocalDbContainer();
 		
 		// test DtCollector
 		testDtCollector();
-		
-		// test WsHandler
-//		testWsHandler();
 
 	}
 

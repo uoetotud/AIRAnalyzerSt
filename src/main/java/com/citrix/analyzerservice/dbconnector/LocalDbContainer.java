@@ -262,7 +262,8 @@ public class LocalDbContainer implements IDbConnector {
 		return stats;
 	}
 
-	private List<List<String>> readFile(String path, String delimiter, String size) {
+	@Override
+	public List<List<String>> readFile(String path, String delimiter, String size) {
 		BufferedReader br = null;
 		String line = "";
 		List<List<String>> data = new ArrayList<List<String>>();
