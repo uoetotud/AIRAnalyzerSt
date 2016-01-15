@@ -60,7 +60,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 					List<ChannelScore> chanScores = new ArrayList<ChannelScore>();
 					
 					for (String channelId : channelIds) {					
-						ChannelScore chanScore = calChannelScore(newConfId, channelId);						
+						ChannelScore chanScore = calcChannelScore(newConfId, channelId);						
 						chanScores.add(chanScore);
 						
 						// update channel with new score in cache
@@ -72,7 +72,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 					if (!updateChanList(newConfId, chanScores))
 						logger.error("Cannot update ChanList.");
 					
-					confScore = calConferenceScore(newConfId, chanScores);
+					confScore = calcConferenceScore(newConfId, chanScores);
 					confScores.add(confScore);
 					
 					// update conference with new score in cache
@@ -168,7 +168,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 	}
 	
 	@Override
-	public ConferenceScore calConferenceScore(String confId, List<ChannelScore> chanScores) {
+	public ConferenceScore calcConferenceScore(String confId, List<ChannelScore> chanScores) {
 		
 		List<LocalDbChannel> channels = ldc.findConfChannels(confId);
 		if (channels == null || channels.isEmpty())
@@ -195,7 +195,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 	}
 	
 	@Override
-	public ChannelScore calChannelScore(String confId, String chanId) {
+	public ChannelScore calcChannelScore(String confId, String chanId) {
 		
 		int i = 0, j = 0, size = 0, counter = 0;
 		

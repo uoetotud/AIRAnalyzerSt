@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.carrotsearch.sizeof.RamUsageEstimator;
@@ -42,11 +43,11 @@ public class TestSizeofLib {
 		
 		boolean b = true;
 		char c = 'a';
-		short s = 3;
-		float f = 3;
-		int i = 3;
-		double d = 3;
-		long l = 3;
+		short s = (short) 3000000;
+		float f = (float) 3000000.1111;
+		int i = 3000000;
+		double d = 3000000;
+		long l = 3000000;
 		
 		System.out.println("boolean: " + RamUsageEstimator.sizeOf(b) + " bytes.");
 		System.out.println("char: " + RamUsageEstimator.sizeOf(c) + " bytes.");
@@ -58,6 +59,7 @@ public class TestSizeofLib {
 	}
 	
 	@Test
+	@Ignore
 	public void getJavaObjectSize() {
 		System.out.println("** Get java objects sizes **");
 		
@@ -71,6 +73,7 @@ public class TestSizeofLib {
 	}
 	
 	@Test
+//	@Ignore
 	public void getMyObjectSize() {
 		System.out.println("** Get self-defined objects sizes **");
 		

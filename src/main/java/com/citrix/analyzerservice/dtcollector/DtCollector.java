@@ -67,7 +67,7 @@ public class DtCollector {
 		LocalDbConference conference = null;
 		
 		if (Main.cacheIsEnabled) {
-			String key = confId + "_summary";
+			String key = confId + "_ConfSummary";
 			if (Main.cache != null && Main.cache.contains(key)) {
 				logger.info("Conference " + confId + " summary cached - return directly.");
 				
@@ -96,7 +96,7 @@ public class DtCollector {
 		LocalDbConference conference = null;
 		
 		if (Main.cacheIsEnabled) {
-			String key = confId + "_details";
+			String key = confId + "_ConfDetails";
 			if (Main.cache != null && Main.cache.contains(key)) {
 				logger.info("Conference " + confId + " details cached - return directly.");
 				
@@ -125,7 +125,7 @@ public class DtCollector {
 		List<LocalDbChannel> channels = null;
 
 		if (Main.cacheIsEnabled) {
-			String key = confId + "_channels";
+			String key = confId + "_ConfChannels";
 			if (Main.cache != null && Main.cache.contains(key)) {
 				logger.info("Conference " + confId + " channels cached - return directly.");
 				
@@ -157,7 +157,7 @@ public class DtCollector {
 		LocalDbChannel channel = null;
 		
 		if (Main.cacheIsEnabled) {
-			String key = chanId + "_summary";
+			String key = chanId + "_ChanSummary";
 			if (Main.cache != null && Main.cache.contains(key)) {
 				logger.info("Conference " + chanId + " summary cached - return directly.");
 				
@@ -186,7 +186,7 @@ public class DtCollector {
 		LocalDbChannel channel = null;
 		
 		if (Main.cacheIsEnabled) {
-			String key = chanId + "_details";
+			String key = chanId + "_ChanDetails";
 			if (Main.cache != null && Main.cache.contains(key)) {
 				logger.info("Conference " + chanId + " details cached - return directly.");
 				

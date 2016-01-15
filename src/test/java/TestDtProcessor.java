@@ -48,7 +48,7 @@ public class TestDtProcessor {
 //		ChannelScore score = dp.calChannelScore("00000000-0000-0000-0000000000000000", "C42E0EA0-E3D3-453E-ABCDEFG123456789");	
 		
 		List<ChannelScore> chanScores = new ArrayList<ChannelScore>();
-		ChannelScore score = dp.calChannelScore(confId, "C05C1C75-8DDF-4906-9C9CC69277926064");
+		ChannelScore score = dp.calcChannelScore(confId, "C05C1C75-8DDF-4906-9C9CC69277926064");
 		chanScores.add(score);
 		
 		System.out.println("Channel 0:");
@@ -57,7 +57,7 @@ public class TestDtProcessor {
 		System.out.println(score.getAvgPacketLoss());
 		System.out.println();
 		
-		score = dp.calChannelScore(confId, "C42E0EA0-E3D3-453E-A6A6458B611B89D6");
+		score = dp.calcChannelScore(confId, "C42E0EA0-E3D3-453E-A6A6458B611B89D6");
 		chanScores.add(score);
 		
 		System.out.println("Channel 1:");
@@ -66,7 +66,7 @@ public class TestDtProcessor {
 		System.out.println(score.getAvgPacketLoss());
 		System.out.println();
 		
-		score = dp.calChannelScore(confId, "B620092E-1B06-4A4D-829811D6003FB46A");
+		score = dp.calcChannelScore(confId, "B620092E-1B06-4A4D-829811D6003FB46A");
 		chanScores.add(score);
 		
 		System.out.println("Channel 2:");
@@ -80,7 +80,7 @@ public class TestDtProcessor {
 	
 	@Test
 	public ConferenceScore calConferenceScore(List<ChannelScore> chanScores) {
-		ConferenceScore score = dp.calConferenceScore("00000000-0000-0000-0000000000000000", chanScores);
+		ConferenceScore score = dp.calcConferenceScore("00000000-0000-0000-0000000000000000", chanScores);
 		
 		System.out.println("Conference:");
 		System.out.println(score.getAvgPLIndicator());

@@ -48,7 +48,7 @@ public class Main {
 	@SuppressWarnings("rawtypes")
 	public static void createCache() {
 		cache = new Cache<String, CacheItem>(configs.get("Cache_Type"), parseConfigsTime(configs.get("Cache_TimeOut")), 
-				parseConfigsTime(configs.get("Cache_Clean_Interval")), Integer.parseInt(configs.get("Cache_Size")));
+				parseConfigsTime(configs.get("Cache_Clean_Interval")), parseConfigsCapacity(configs.get("Cache_Size")));
 	}
 	
 	public static long parseConfigsTime(String time) {
@@ -59,11 +59,26 @@ public class Main {
 		else if (time.endsWith("h"))
 			return (Long.parseLong(time.substring(0, time.length()-1)) * 3600000);
 		else {
-			logger.warn("Unvalid time configuration. Time in configuration should end of 's' (second), "
-					+ "'m' (minute) or 'h' (hour), e.g. 30s, 2m, 1h etc.\nUse default time value: 1 hour.");
+			logger.warn("Unvalid time configuration. It should end of 's' (second), 'm' (minute) or 'h' (hour), "
+					+ "e.g. 30s, 2m, 1h etc.\nUse default time value: 1 hour.");
 			return 3600000;
-		}
-			
+		}			
+	}
+	
+	public static int parseConfigsCapacity(String capacity) {
+		if (capacity.toLowerCase().endsWith("bytes"))
+			return (Integer.parseInt(capacity.substring(0, capacity.length()-5)));
+		else if (capacity.toLowerCase().endsWith("kb"))
+			return (Integer.parseInt(capacity.substring(0, capacity.length()-2)) * 1000);
+		else if (capacity.toLowerCase().endsWith("mb"))
+			return (Integer.parseInt(capacity.substring(0, capacity.length()-2)) * 1000000);
+		else if (capacity.toLowerCase().endsWith("gb"))
+			return (Integer.parseInt(capacity.substring(0, capacity.length()-2)) * 1000000000);
+		else {
+			logger.warn("Unvalid cache size configuration. It should end of 'Bytes', 'KB', 'MB' or 'GB', e.g. "
+					+ "80000000Bytes, 600000KB, 300MB, 1GB etc.\nUse default capacity value: 1 GB.");
+			return 1000000000;
+		}			
 	}
 
 	@SuppressWarnings("deprecation")

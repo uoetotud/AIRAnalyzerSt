@@ -9,9 +9,9 @@ public interface IDtProcessor {
 	
 	boolean checkUpdate();
 	
-	ConferenceScore calConferenceScore(String confIds, List<ChannelScore> chanScores);
+	ConferenceScore calcConferenceScore(String confIds, List<ChannelScore> chanScores);
 	
-	ChannelScore calChannelScore(String confId, String chanId);
+	ChannelScore calcChannelScore(String confId, String chanId);
 	
 	boolean updateConfList(List<String> confIds, List<ConferenceScore> confScores);
 	
