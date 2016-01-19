@@ -49,7 +49,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 			
 			if (updatedConfIds.containsKey("newConfIds")) {
 				List<String> newConfIds = updatedConfIds.get("newConfIds");
-				logger.info(new StringBuilder("Found ").append(Integer.toString(newConfIds.size())).append(" new conference(s) to process."));
+				logger.info(new StringBuilder("Found ").append(Integer.toString(newConfIds.size())).append(" new conference."));
 				
 				List<ConferenceScore> confScores = new ArrayList<ConferenceScore>();
 				ConferenceScore confScore = new ConferenceScore(0, 0);
@@ -64,42 +64,58 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 						chanScores.add(chanScore);
 						
 						// update channel with new score in cache
-						if (Main.cache != null && Main.cache.size() > 0)
+						if (Main.cache != null && Main.cache.size() > 0) {
 							updateChanScoreInCache(channelId, chanScore);
+							logger.debug("Updated channel in cache with score.");
+						}
 					}
 					
 					// update channel file
 					if (!updateChanList(newConfId, chanScores))
 						logger.error("Cannot update ChanList.");
+					else
+						logger.debug("Added new channel in ChanList.txt file.");
 					
 					confScore = calcConferenceScore(newConfId, chanScores);
 					confScores.add(confScore);
 					
 					// update conference with new score in cache
-					if (Main.cache != null && Main.cache.size() > 0)
+					if (Main.cache != null && Main.cache.size() > 0) {
 						updateConfScoreInCache(newConfId, confScore);
+						logger.debug("Updated conference in cache with score.");
+					}
 				}		
 				
 				// update conference file
 				if (!updateConfList(newConfIds, confScores))
 					logger.error("Cannot update ConfList.");
+				else
+					logger.debug("Added new conference in ConfList.txt file.");
 			}
 			
 			if (updatedConfIds.containsKey("oldConfIds")) {
 				List<String> oldConfIds = updatedConfIds.get("oldConfIds");
-				logger.info(new StringBuilder("Found ").append(Integer.toString(oldConfIds.size())).append(" deprecated conferences."));
+				logger.info(new StringBuilder("Found ").append(Integer.toString(oldConfIds.size())).append(" deprecated conference."));
 				
 				for (String oldConfId : oldConfIds) {
 					
 					// remove conference (including its channels) from cache
-					if (Main.cache != null && Main.cache.size() > 0)
+					if (Main.cache != null && Main.cache.size() > 0) {
 						removeConfernceFromCache(oldConfId);
+						logger.debug("Removed conference with its channels in cache.");
+					}
 					
-					// update conference file & channel file
+					// update conference file
 					if (!ldc.updateFile("conference", oldConfId))
 						logger.error("Cannot delete items in ConfList.");
+					else
+						logger.debug("Removed conference in ConfList.txt file.");
+					
+					// update channel file
 					if (!ldc.updateFile("channel", oldConfId))
 						logger.error("Cannot delete items in ChanList.");
+					else
+						logger.debug("Removed channel in ChanList.txt file.");
 				}
 			}
 			
@@ -148,18 +164,25 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 	@Override
 	public boolean updateChanList(String confId, List<ChannelScore> chanScores) {
 		
-		List<LocalDbChannel> channels = ldc.findConfChannels(confId);
-		if (channels == null || channels.isEmpty())
+		List<String> channelIds = ldc.getConfChannelIds(confId);
+		if (channelIds == null || channelIds.isEmpty())
 			return false;
 		
-		if (channels.size() != chanScores.size())
+		if (channelIds.size() != chanScores.size())
 			return false;
 		
-		int size = channels.size();
+//		List<LocalDbChannel> channels = ldc.findConfChannels(confId);
+//		if (channels == null || channels.isEmpty())
+//			return false;
+//		
+//		if (channels.size() != chanScores.size())
+//			return false;
+		
+		int size = channelIds.size();
 		String[] channelItems = new String[size];
 		
 		for (int i=0; i<size; i++) {
-			channelItems[i] = new StringBuilder(confId).append(", ").append(channels.get(i).getUuid()).append(", ")
+			channelItems[i] = new StringBuilder(confId).append(", ").append(channelIds.get(i)).append(", ")
 					.append(Integer.toString(chanScores.get(i).getAvgPLIndicator())).append(", ")
 					.append(Integer.toString(chanScores.get(i).getAvgLevelIndicator())).append(", ")
 					.append(Double.toString(chanScores.get(i).getAvgPacketLoss())).toString();
