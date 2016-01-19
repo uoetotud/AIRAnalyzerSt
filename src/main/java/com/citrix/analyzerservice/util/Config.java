@@ -28,7 +28,7 @@ public class Config {
 			if (inputStream != null) {
 				prop.load(inputStream);
 			} else {
-				logger.error("Cannot find '" + propFileName + "' configuration file.");
+				logger.error(new StringBuilder("Cannot find '").append(propFileName).append("' configuration file."));
 			}
 			
 			Enumeration<?> e = prop.propertyNames();
@@ -43,7 +43,7 @@ public class Config {
 			try {
 				inputStream.close();
 			} catch (IOException e) {
-				logger.error("Cannot close " + propFileName + " file.");
+				logger.error(new StringBuilder("Cannot close ").append(propFileName).append(" file."));
 			}
 		}
 		
@@ -66,16 +66,16 @@ public class Config {
 		String cacheSize = configs.get("Cache_Size");
 		
 		logger.debug("********** config.properties *********");
-		logger.debug("Host :: " + host);
-		logger.debug("Port :: " + port);
-		logger.debug("DataProcessor_Execution_Period :: " + dtProcessorExecPeriod + "s");
-		logger.debug("MAX_Stats_Read_Line :: " + lines);
-		logger.debug("File_Directory :: " + directory);		
-		logger.debug("Cache_Enable :: " + cacheEnabled);
-		logger.debug("Cache_Type :: " + cacheType);
-		logger.debug("Cache_TimeOut :: " + cacheTimeOut);
-		logger.debug("Cache_Clean_Interval :: " + cacheCleanInterval);
-		logger.debug("Cache_Size :: " + cacheSize);
+		logger.debug(new StringBuilder("Host :: ").append(host));
+		logger.debug(new StringBuilder("Port :: ").append(port));
+		logger.debug(new StringBuilder("DataProcessor_Execution_Period :: ").append(dtProcessorExecPeriod).append('s'));
+		logger.debug(new StringBuilder("MAX_Stats_Read_Line :: ").append(lines));
+		logger.debug(new StringBuilder("File_Directory :: ").append(directory));		
+		logger.debug(new StringBuilder("Cache_Enable :: ").append(cacheEnabled));
+		logger.debug(new StringBuilder("Cache_Type :: ").append(cacheType));
+		logger.debug(new StringBuilder("Cache_TimeOut :: ").append(cacheTimeOut));
+		logger.debug(new StringBuilder("Cache_Clean_Interval :: ").append(cacheCleanInterval));
+		logger.debug(new StringBuilder("Cache_Size :: ").append(cacheSize));
 		logger.debug("********** config.properties *********");
 		
 		if (host.isEmpty())

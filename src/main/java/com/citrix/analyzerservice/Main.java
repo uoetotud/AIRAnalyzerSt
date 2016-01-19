@@ -39,10 +39,10 @@ public class Main {
 		}
 	}
 
-	private static HttpServer startServer(String uri) {        
+	private static HttpServer startServer(String BASE_URI) {        
 		final ResourceConfig rc = new ResourceConfig().packages("com.citrix.analyzerservice.wshandler");
 
-		return GrizzlyHttpServerFactory.createHttpServer(URI.create(uri), rc);
+		return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 	
 	@SuppressWarnings("rawtypes")
@@ -59,8 +59,8 @@ public class Main {
 		else if (time.endsWith("h"))
 			return (Long.parseLong(time.substring(0, time.length()-1)) * 3600000);
 		else {
-			logger.warn("Unvalid time configuration. It should end of 's' (second), 'm' (minute) or 'h' (hour), "
-					+ "e.g. 30s, 2m, 1h etc.\nUse default time value: 1 hour.");
+			logger.warn(new StringBuilder("Unvalid time configuration. It should end of 's' (second), 'm' (minute) or 'h' (hour), ")
+					.append("e.g. 30s, 2m, 1h etc.\nUse default time value: 1 hour."));
 			return 3600000;
 		}			
 	}
@@ -75,8 +75,8 @@ public class Main {
 		else if (capacity.toLowerCase().endsWith("gb"))
 			return (Integer.parseInt(capacity.substring(0, capacity.length()-2)) * 1000000000);
 		else {
-			logger.warn("Unvalid cache size configuration. It should end of 'Bytes', 'KB', 'MB' or 'GB', e.g. "
-					+ "80000000Bytes, 600000KB, 300MB, 1GB etc.\nUse default capacity value: 1 GB.");
+			logger.warn(new StringBuilder("Unvalid cache size configuration. It should end of 'Bytes', 'KB', 'MB' or 'GB', e.g. ")
+					.append("80000000Bytes, 600000KB, 300MB, 1GB etc.\nUse default capacity value: 1 GB."));
 			return 1000000000;
 		}			
 	}
@@ -88,15 +88,15 @@ public class Main {
 		String host = configs.get("Host");
 		String port = configs.get("Port");
 		String dtProcessorExecPeriod = configs.get("DataProcessor_Execution_Period");
-		String BASE_URI = "http://" + host + ":" + port + "/AIRAnalyzerService"; // Base URI for Grizzly HTTP server to listen on
+		StringBuilder BASE_URI = new StringBuilder("http://").append(host).append(':').append(port).append("/AIRAnalyzerService");
     	
 		// start server
-		final HttpServer server = startServer(BASE_URI);
-		logger.info(String.format("AIRAnalyzerService started at %s\nHit enter to stop...", BASE_URI));
+		final HttpServer server = startServer(BASE_URI.toString());
+		logger.info(new StringBuilder("AIRAnalyzerService started at ").append(BASE_URI).append("\nHit enter to stop..."));
 		        
 		// run DtProcessor in background in periodically
 		long execPeriod = parseConfigsTime(dtProcessorExecPeriod);
-		logger.info("Config: Data processor executes every " + execPeriod/1000 + " seconds.");
+		logger.info(new StringBuilder("Config: Data processor executes every ").append(Long.toString(execPeriod/1000)).append(" seconds."));
 		
 		Timer timer = new Timer();
 		timer.schedule(new DtProcessor(), 0, execPeriod);

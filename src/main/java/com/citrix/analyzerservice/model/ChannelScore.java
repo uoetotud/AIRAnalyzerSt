@@ -7,7 +7,6 @@ public class ChannelScore {
 	private double avgPacketLoss;
 	
 	public ChannelScore(int avgPLIndicator, int avgLevelIndicator, double avgPacketLoss) {
-		super();
 		this.avgPLIndicator = avgPLIndicator;
 		this.avgLevelIndicator = avgLevelIndicator;
 		this.avgPacketLoss = avgPacketLoss;

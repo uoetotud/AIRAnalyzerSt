@@ -38,7 +38,7 @@ public class DtCollector {
 				
 				conferenceList = ldc.findConferenceList();
 				if (conferenceList != null && !conferenceList.isEmpty()) {
-					logger.info("Collected " + conferenceList.size() + " conferences.");
+					logger.info(new StringBuilder("Collected ").append(Integer.toString(conferenceList.size())).append(" conferences."));
 					Main.cache.put(key, new CacheItem(conferenceList, System.currentTimeMillis()));
 				} else {
 					logger.info("No channels found.");
@@ -48,7 +48,7 @@ public class DtCollector {
 		} else {
 			conferenceList = ldc.findConferenceList();
 			if (conferenceList != null && !conferenceList.isEmpty())
-				logger.info("Collected " + conferenceList.size() + " conferences.");
+				logger.info(new StringBuilder("Collected ").append(Integer.toString(conferenceList.size())).append(" conferences."));
 			else {
 				logger.info("No channels found.");
 				return null;
@@ -67,24 +67,24 @@ public class DtCollector {
 		LocalDbConference conference = null;
 		
 		if (Main.cacheIsEnabled) {
-			String key = confId + "_ConfSummary";
+			String key = new StringBuilder(confId).append("_ConfSummary").toString();
 			if (Main.cache != null && Main.cache.contains(key)) {
-				logger.info("Conference " + confId + " summary cached - return directly.");
+				logger.info(new StringBuilder("Conference ").append(confId).append(" summary cached - return directly."));
 				
 				conference = (LocalDbConference) Main.cache.fetch(key).getCacheObject();			
 			} else {
-				logger.info("Conference " + confId + " summary NOT cached.");
+				logger.info(new StringBuilder("Conference ").append(confId).append(" summary NOT cached."));
 				
 				conference = ldc.findConference(confId, false);
 				if (conference != null) {
-					logger.info("Collected conference " + confId + " summary.");
+					logger.info(new StringBuilder("Collected conference ").append(confId).append(" summary."));
 					Main.cache.put(key, new CacheItem(conference, System.currentTimeMillis()));
 				}					
 			}
 		} else {
 			conference = ldc.findConference(confId, false);
 			if (conference != null)
-				logger.info("Collected conference " + confId + " summary.");
+				logger.info(new StringBuilder("Collected conference ").append(confId).append(" summary."));
 		}			
 		
 		return conference;
@@ -96,24 +96,24 @@ public class DtCollector {
 		LocalDbConference conference = null;
 		
 		if (Main.cacheIsEnabled) {
-			String key = confId + "_ConfDetails";
+			String key = new StringBuilder(confId).append("_ConfDetails").toString();
 			if (Main.cache != null && Main.cache.contains(key)) {
-				logger.info("Conference " + confId + " details cached - return directly.");
+				logger.info(new StringBuilder("Conference ").append(confId).append(" details cached - return directly."));
 				
 				conference = (LocalDbConference) Main.cache.fetch(key).getCacheObject();			
 			} else {
-				logger.info("Conference " + confId + " details NOT cached.");
+				logger.info(new StringBuilder("Conference ").append(confId).append(" details NOT cached."));
 				
 				conference = ldc.findConference(confId, true);
 				if (conference != null) {
-					logger.info("Collected conference " + confId + " details.");
+					logger.info(new StringBuilder("Collected conference ").append(confId).append(" details."));
 					Main.cache.put(key, new CacheItem(conference, System.currentTimeMillis()));
 				}
 			}
 		} else {
 			conference = ldc.findConference(confId, true);
 			if (conference != null)
-				logger.info("Collected conference " + confId + " details.");
+				logger.info(new StringBuilder("Collected conference ").append(confId).append(" details."));
 		}	
 		
 		return conference;
@@ -125,17 +125,18 @@ public class DtCollector {
 		List<LocalDbChannel> channels = null;
 
 		if (Main.cacheIsEnabled) {
-			String key = confId + "_ConfChannels";
+			String key = new StringBuilder(confId).append("_ConfChannels").toString();
 			if (Main.cache != null && Main.cache.contains(key)) {
-				logger.info("Conference " + confId + " channels cached - return directly.");
+				logger.info(new StringBuilder("Conference ").append(confId).append(" channels cached - return directly."));
 				
 				channels = (List<LocalDbChannel>) Main.cache.fetch(key).getCacheObject();		
 			} else {
-				logger.info("Conference " + confId + " channels NOT cached.");
+				logger.info(new StringBuilder("Conference ").append(confId).append(" channels NOT cached."));
 				
 				channels = ldc.findConfChannels(confId);
 				if (channels != null && !channels.isEmpty()) {
-					logger.info("Collected " + channels.size() + " channels for conference " + confId + ".");
+					logger.info(new StringBuilder("Collected ").append(Integer.toString(channels.size()))
+							.append(" channels for conference ").append(confId).append('.'));
 					Main.cache.put(key, new CacheItem(channels, System.currentTimeMillis()));
 				} else
 					logger.info("No channels found.");
@@ -143,7 +144,8 @@ public class DtCollector {
 		} else {
 			channels = ldc.findConfChannels(confId);
 			if (channels != null && !channels.isEmpty())
-				logger.info("Collected " + channels.size() + " channels for conference " + confId + ".");
+				logger.info(new StringBuilder("Collected ").append(Integer.toString(channels.size()))
+						.append(" channels for conference ").append(confId).append('.'));
 			else
 				logger.info("No channels found.");
 		}		
@@ -157,24 +159,24 @@ public class DtCollector {
 		LocalDbChannel channel = null;
 		
 		if (Main.cacheIsEnabled) {
-			String key = chanId + "_ChanSummary";
+			String key = new StringBuilder(chanId).append("_ChanSummary").toString();
 			if (Main.cache != null && Main.cache.contains(key)) {
-				logger.info("Conference " + chanId + " summary cached - return directly.");
+				logger.info(new StringBuilder("Conference ").append(chanId).append(" summary cached - return directly."));
 				
 				channel = (LocalDbChannel) Main.cache.fetch(key).getCacheObject();			
 			} else {
-				logger.info("Conference " + chanId + " summary NOT cached.");
+				logger.info(new StringBuilder("Conference ").append(chanId).append(" summary NOT cached."));
 				
 				channel = ldc.findChannel(null, chanId, false);
 				if (channel != null) {
-					logger.info("Collected channel " + chanId + " summary.");
+					logger.info(new StringBuilder("Collected channel ").append(chanId).append(" summary."));
 					Main.cache.put(key, new CacheItem(channel, System.currentTimeMillis()));
 				}
 			}
 		} else {
 			channel = ldc.findChannel(null, chanId, false);
 			if (channel != null)
-				logger.info("Collected channel " + chanId + " summary.");
+				logger.info(new StringBuilder("Collected channel ").append(chanId).append(" summary."));
 		}		
 		
 		return channel;
@@ -186,24 +188,24 @@ public class DtCollector {
 		LocalDbChannel channel = null;
 		
 		if (Main.cacheIsEnabled) {
-			String key = chanId + "_ChanDetails";
+			String key = new StringBuilder(chanId).append("_ChanDetails").toString();
 			if (Main.cache != null && Main.cache.contains(key)) {
-				logger.info("Conference " + chanId + " details cached - return directly.");
+				logger.info(new StringBuilder("Conference ").append(chanId).append(" details cached - return directly."));
 				
 				channel = (LocalDbChannel) Main.cache.fetch(key).getCacheObject();			
 			} else {
-				logger.info("Conference " + chanId + " details NOT cached.");
+				logger.info(new StringBuilder("Conference ").append(chanId).append(" details NOT cached."));
 				
 				channel = ldc.findChannel(null, chanId, true);
 				if (channel != null) {
-					logger.info("Collected channel " + chanId + " details.");
+					logger.info(new StringBuilder("Collected channel ").append(chanId).append(" details."));
 					Main.cache.put(key, new CacheItem(channel, System.currentTimeMillis()));
 				}
 			}
 		} else {
 			channel = ldc.findChannel(null, chanId, true);
 			if (channel != null)
-				logger.info("Collected channel " + chanId + " details.");
+				logger.info(new StringBuilder("Collected channel ").append(chanId).append(" details."));
 		}
 		
 		return channel;
@@ -215,13 +217,13 @@ public class DtCollector {
 		
 		int count = size.equalsIgnoreCase("all") ? confList.size() : Integer.parseInt(size);
 		if (count != confList.size())
-			logger.info("Display " + count + " conferences.");
+			logger.info(new StringBuilder("Display ").append(Integer.toString(count)).append(" conferences."));
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm");
 		LocalDateTime after = from.equalsIgnoreCase("any") ? null : LocalDateTime.parse(from, formatter);
 		LocalDateTime before = to.equalsIgnoreCase("any") ? null : LocalDateTime.parse(to, formatter);
 		if (after != null || before != null)
-			logger.info("Display conferences from " + from + " to " + to + ".");
+			logger.info(new StringBuilder("Display conferences from ").append(from).append(" to ").append(to).append('.'));
 		
 		for (int i=0; i<confList.size(); i++) {
 			conf = confList.get(i);

@@ -6,7 +6,6 @@ public class ConferenceScore {
 	private int avgLevelIndicator;
 	
 	public ConferenceScore(int avgPLIndicator, int avgLevelIndicator) {
-		super();
 		this.avgPLIndicator = avgPLIndicator;
 		this.avgLevelIndicator = avgLevelIndicator;
 	}

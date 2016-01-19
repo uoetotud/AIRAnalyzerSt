@@ -47,7 +47,7 @@ public class LocalDbContainer implements IDbConnector {
 			logger.warn("No conference found in system.");
 		}
 		
-		List<String> proConfIds = findProConfIds(defaultPath + "/ConfList.txt");
+		List<String> proConfIds = findProConfIds(new StringBuilder(defaultPath).append("ConfList.txt").toString());
 		if (proConfIds == null || proConfIds.isEmpty()) {
 			logger.warn("No conference found in list.");
 		}
@@ -97,13 +97,13 @@ public class LocalDbContainer implements IDbConnector {
 		
 		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
 		if (folder.isEmpty()) {
-			logger.warn("Cannot find conference " + confId + ".");
+			logger.warn(new StringBuilder("Cannot find conference ").append(confId).append('.'));
 			return null;
 		}
 		
 		LocalDbConference conference = null;
 		
-		String folderPath = defaultPath + folder.get(0);
+		String folderPath = new StringBuilder(defaultPath).append(folder.get(0)).toString();
 		
 		// Get timestamp
 		LocalDateTime timestamp = findConferenceTimestamp(folder.get(0));
@@ -121,7 +121,7 @@ public class LocalDbContainer implements IDbConnector {
 		// Get conference score
 		ConferenceScore score = getConferenceScore(confId);
 		if (score == null) {
-			logger.warn("Conference " + confId + " score is not ready.");
+			logger.warn(new StringBuilder("Conference ").append(confId).append(" score is not ready."));
 			score = new ConferenceScore(-1, -1);
 		}
 				
@@ -171,11 +171,11 @@ public class LocalDbContainer implements IDbConnector {
 		
 		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
 		if (folder.isEmpty()) {
-			logger.error("Cannot find conference " + confId + ".");
+			logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
 			return null;
 		}
 		
-		String folderPath = defaultPath + folder.get(0);
+		String folderPath = new StringBuilder(defaultPath).append(folder.get(0)).toString();
 		
 		// Get startTime and endTime
 		LocalDateTime startTime = defaultTime;
@@ -185,18 +185,18 @@ public class LocalDbContainer implements IDbConnector {
 		ChannelStats stats = null;
 		
 		if (showAll) {
-			logger.debug("Fetching channel " + chanId + " statistics...");
+			logger.debug(new StringBuilder("Fetching channel ").append(chanId).append(" statistics..."));
 			List<String> files = getFileNameFromId(folderPath, chanId, "file");
 			if (files != null && !files.isEmpty())
 				stats = findChannelStats(folderPath, files);
 			else
-				logger.error("Cannot find channel " + chanId + " statistics.");
+				logger.error(new StringBuilder("Cannot find channel ").append(chanId).append(" statistics."));
 		}
 		
 		// Get channel score
 		ChannelScore score = getChannelScore(chanId);
 		if (score == null) {
-			logger.warn("Channel " + chanId + " score is not ready.");
+			logger.warn(new StringBuilder("Channel ").append(chanId).append(" score is not ready."));
 			score = new ChannelScore(-1, -1, -1);
 		}
 		
@@ -215,14 +215,14 @@ public class LocalDbContainer implements IDbConnector {
 		
 		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
 		if (folder.isEmpty()) {
-			logger.error("Cannot find conference " + confId + ".");
+			logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
 			return null;
 		}
 		
-		String folderPath = defaultPath + folder.get(0);		
+		String folderPath = new StringBuilder(defaultPath).append(folder.get(0)).toString();		
 		List<String> files = getFileNameFromId(folderPath, chanId, "file");
 		if (files == null || files.isEmpty()) {
-			logger.error("Cannot find channel " + chanId + ".");
+			logger.error(new StringBuilder("Cannot find channel ").append(chanId).append('.'));
 			return null;
 		}
 		
@@ -247,7 +247,7 @@ public class LocalDbContainer implements IDbConnector {
 //		Map<String, double[]> strEnhData = null;
 		
 		for (int i=0; i<files.size(); i++) {
-			strProData = convertDataStructure(readFile(folderPath+"/"+files.get(i), ",", maxStatsReadLine));
+			strProData = convertDataStructure(readFile(new StringBuilder(folderPath).append("/").append(files.get(i)).toString(), ",", maxStatsReadLine));
 //			strEnhData = convertDataStructure(readFile(path, ","));
 		}
 		
@@ -277,7 +277,7 @@ public class LocalDbContainer implements IDbConnector {
 			
 			while ((line = br.readLine()) != null) {
 				ArrayList<String> dataLine = new ArrayList<String>();
-				String[] splitData = line.split("\\s*"+delimiter+"\\s*");
+				String[] splitData = line.split(new StringBuilder("\\s*").append(delimiter).append("\\s*").toString());
 				for (int i=0; i<splitData.length; i++)
 					if (!(splitData[i] == null) || !(splitData[i].length() == 0))
 						dataLine.add(splitData[i].trim());
@@ -291,15 +291,15 @@ public class LocalDbContainer implements IDbConnector {
 			}
 			
 		} catch (FileNotFoundException e) {
-			logger.error("Cannot find file in " + path + ".");
+			logger.error(new StringBuilder("Cannot find file in ").append(path).append('.'));
 		} catch (IOException e) {
-			logger.error("Error in reading file in " + path + ".");
+			logger.error(new StringBuilder("Error in reading file in ").append(path).append('.'));
 		} finally {
 			if (br != null)
 				try {
 					br.close();
 				} catch (IOException e) {
-					logger.error("Cannot close file in " + path + ".");
+					logger.error(new StringBuilder("Cannot close file in ").append(path).append('.'));
 				}
 		}
 		
@@ -311,14 +311,14 @@ public class LocalDbContainer implements IDbConnector {
 	public boolean writeFile(String type, String[] content) {
 		
 		String fileName = type.equalsIgnoreCase("conference") ? "ConfList.txt" : "ChanList.txt";
-		logger.debug("Writing " + fileName + "...");
+		logger.debug(new StringBuilder("Writing ").append(fileName).append("..."));
 		
 		try {			
-			File file = new File(defaultPath + fileName);
+			File file = new File(new StringBuilder(defaultPath).append(fileName).toString());
 			boolean newlyCreated = false;
 			
 			if (!file.exists()) {
-				logger.warn(fileName + " not exists. Creating a new one...");
+				logger.warn(new StringBuilder(fileName).append(" not exists. Creating a new one..."));
 				file.createNewFile();
 				newlyCreated = true;
 			}
@@ -347,7 +347,7 @@ public class LocalDbContainer implements IDbConnector {
 			return true;
 			
 		} catch (IOException e) {
-			logger.error("Error in writing file " + fileName + ".");
+			logger.error(new StringBuilder("Error in writing file ").append(fileName).append('.'));
 		}
 		
 		return false;
@@ -357,17 +357,17 @@ public class LocalDbContainer implements IDbConnector {
 	public boolean updateFile(String type, String confId) {
 		
 		String fileName = type.equalsIgnoreCase("conference") ? "ConfList.txt" : "ChanList.txt";
-		logger.debug("Updating " + fileName + "...");
+		logger.debug(new StringBuilder("Updating ").append(fileName).append("..."));
 		
 		try {			
-			File origFile = new File(defaultPath + fileName);
+			File origFile = new File(new StringBuilder(defaultPath).append(fileName).toString());
 			
 			if (!origFile.exists()) {
-				logger.error(fileName + " not exists.");
+				logger.error(new StringBuilder(fileName).append(" not exists."));
 				return false;
 			}
 			
-			File tempFile = new File(origFile.getAbsolutePath().replace(fileName, "Temp"+fileName));
+			File tempFile = new File(origFile.getAbsolutePath().replace(fileName, new StringBuilder("Temp").append(fileName)));
 			BufferedReader br = new BufferedReader(new FileReader(origFile.getAbsolutePath()));
 			BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile));
 			String line = null;
@@ -381,10 +381,10 @@ public class LocalDbContainer implements IDbConnector {
 			br.close();
 			
 			if (!origFile.delete())
-				logger.error("Cannot delete original " + fileName + ".");
+				logger.error(new StringBuilder("Cannot delete original ").append(fileName).append('.'));
 			
 			if (!tempFile.renameTo(origFile))
-				logger.error("Cannot rename new file to " + fileName + ".");
+				logger.error(new StringBuilder("Cannot rename new file to ").append(fileName).append('.'));
 			
 			return true;
 			
@@ -445,7 +445,7 @@ public class LocalDbContainer implements IDbConnector {
 		File[] fileLists = folder.listFiles();
 		
 		if (fileLists.length <= 0) {
-			logger.warn("Cannot find folder in " + path + ".");
+			logger.warn(new StringBuilder("Cannot find folder in ").append(path).append('.'));
 			return new ArrayList<String>();
 		}
 		
@@ -475,9 +475,6 @@ public class LocalDbContainer implements IDbConnector {
 				if (fileLists[i].isFile() && fileLists[i].getName().contains("MixerSumStream") && fileLists[i].getName().endsWith(".txt"))
 					files.add(fileLists[i].getName()); 
 		}
-		
-//		if (files.isEmpty())
-//			logger.warn("Cannot find file from uuid " + uuid + " in " + path + ".");
 		
 		return files;
 	}
@@ -509,15 +506,15 @@ public class LocalDbContainer implements IDbConnector {
 		
 		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
 		if (folder.isEmpty()) {
-			logger.error("Cannot find conference " + confId + ".");
+			logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
 			return null;
 		}
 		
-		File path = new File(defaultPath + folder.get(0));
+		File path = new File(new StringBuilder(defaultPath).append(folder.get(0)).toString());
 		File[] fileLists = path.listFiles();
 		
 		if (fileLists.length <= 0) {
-			logger.error("Cannot find channels in conference through " + path + ".");
+			logger.error(new StringBuilder("Cannot find channels in conference through ").append(path).append('.'));
 			return null;
 		}
 		
@@ -537,14 +534,14 @@ public class LocalDbContainer implements IDbConnector {
 			String confId = folder;
 			List<String> folders = getFileNameFromId(defaultPath, confId, "folder");
 			if (folder.isEmpty()) {
-				logger.error("Cannot find conference " + confId + ".");
+				logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
 				return null;
 			}
 			
 			folder = folders.get(0);
 		}
 		
-		String dateTimeStr = "20" + folder.substring(0, 13);
+		String dateTimeStr = new StringBuilder(Integer.toString(20)).append(folder.substring(0, 13)).toString();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 		LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, formatter);
 		
@@ -563,7 +560,8 @@ public class LocalDbContainer implements IDbConnector {
 		Mixer m = null;
 		Map<String, double[]> mixData = null;
 
-		mixData = convertDataStructure(readFile(folderPath + "/" + getFileNameFromId(folderPath, "", "mixer").get(0), ",", maxStatsReadLine));
+		mixData = convertDataStructure(readFile(new StringBuilder(folderPath).append('/')
+				.append(getFileNameFromId(folderPath, "", "mixer").get(0)).toString(), ",", maxStatsReadLine));
 		
 		if (mixData != null && !mixData.isEmpty())
 			m = new Mixer(mixData.get("quantum"), mixData.get("nConferenceId"), mixData.get("nSpeakers"));
@@ -577,7 +575,7 @@ public class LocalDbContainer implements IDbConnector {
 	
 	private ConferenceScore getConferenceScore(String confId) {
 		ConferenceScore score = null;
-		List<List<String>> confs = readFile(defaultPath+"/ConfList.txt", ",", "all");
+		List<List<String>> confs = readFile(new StringBuilder(defaultPath).append("ConfList.txt").toString(), ",", "all");
 		for (List<String> conf : confs)
 			if (conf.get(0).equals(confId))
 				score = new ConferenceScore(Integer.parseInt(conf.get(3)), Integer.parseInt(conf.get(4)));
@@ -587,7 +585,7 @@ public class LocalDbContainer implements IDbConnector {
 	
 	private ChannelScore getChannelScore(String chanId) {
 		ChannelScore score = null;
-		List<List<String>> chans = readFile(defaultPath+"/ChanList.txt", ",", "all");
+		List<List<String>> chans = readFile(new StringBuilder(defaultPath).append("ChanList.txt").toString(), ",", "all");
 		for (List<String> chan : chans)
 			if (chan.get(1).equals(chanId))
 				score = new ChannelScore(Integer.parseInt(chan.get(2)), Integer.parseInt(chan.get(3)), Double.parseDouble(chan.get(4)));

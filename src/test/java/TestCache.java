@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.citrix.analyzerservice.model.CacheItem;
@@ -99,7 +100,6 @@ public class TestCache {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-//	@Ignore
 	public void testCacheItemExpire() throws InterruptedException {
 		System.out.println("\n** Test cache item expires **");
 		cache = new Cache<String, CacheItem>("LRU", 2000, 3000, 500000);

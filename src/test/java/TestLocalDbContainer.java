@@ -40,10 +40,6 @@ public class TestLocalDbContainer {
 	@After
 	public void tearDown() {
 		System.out.println("-----------------------------------------------------");
-		
-		File f = new File(path+"ConfList.txt");
-		if (f.exists())
-			f.delete();
 	}
 
 	/*
@@ -104,17 +100,16 @@ public class TestLocalDbContainer {
 		System.out.println("Found no updated conference(s).");
 	}
 	
-	/*
-	 * Pre-condition: folder does not contain file ConfList.txt
-	 * Post-condition: folder has file ConfList.txt with 4 entries: id1, id3, id4, id5
-	 * */
 	@Test
 	public void testReadWriteUpdateFile() {
 		System.out.println("\n** Read/Write/Update file **");
 
 		String file = path + "ConfList.txt";
+		File f = new File(file);
+		if (f.exists())
+			f.delete();
 		System.out.println("ConfList.txt file not exists.");
-		assertFalse(new File(file).exists());
+		assertFalse(f.exists());
 		
 		List<List<String>> readContent = ldc.readFile(file, ",", "all");
 		assertEquals(readContent.size(), 0);
@@ -148,7 +143,9 @@ public class TestLocalDbContainer {
 		assertEquals(readContent.size(), 5);
 		for (int i=0; i<readContent.size(); i++) {
 			assertFalse(readContent.get(i).contains("id2"));
-		}		
+		}
+		
+		f.delete();
 	}
 	
 

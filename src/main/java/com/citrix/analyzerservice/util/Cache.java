@@ -25,50 +25,49 @@ public class Cache<K, V> implements ICache<K, V> {
 	private static final int CHANNEL_SUMMARY = 300;
 	private static final int CHANNEL_DETAILS = 175000;
 	private static final int MAX_SIZE = 300000000;
-	private static final int MIN_SIZE = 2000000;
+	private static final int MIN_SIZE = 200000;
 	
 	private String type = "";
 	private long timeOut = 0;
 	private int maxCacheSize = 0, usedCacheSize = 0;
 	private ConcurrentHashMap<K, V> cacheMap = null;
 	
-	public Cache(String type, long timeOut, final long cleanInterval, int maxSize) {
-		if (!type.equalsIgnoreCase("LRU") && !type.equalsIgnoreCase("LFU")) {
+	public Cache(String _type, long _timeOut, final long _cleanInterval, int _maxSize) {
+		if (!_type.equalsIgnoreCase("LRU") && !_type.equalsIgnoreCase("LFU")) {
 			type = "LRU";
 			logger.warn("Cache type not specified or invalid - set to default type: LRU.");
 		}
 		
-		this.type = type;
-		this.timeOut = timeOut;
-		if (maxSize > MAX_SIZE) {
+		type = _type;
+		timeOut = _timeOut;
+		if (_maxSize > MAX_SIZE) {
 			logger.warn("Cache size cannot be configured larger than 1GB - set to maximum size: 1GB.");
-			this.maxCacheSize = MAX_SIZE;
-		} else if (maxSize < MIN_SIZE){
-			logger.warn("Cache size cannot be configured smaller than 2MB - set to minimum size: 2MB.");
-			this.maxCacheSize = MIN_SIZE;
+			maxCacheSize = MAX_SIZE;
+		} else if (_maxSize < MIN_SIZE){
+			logger.warn("Cache size cannot be configured smaller than 200KB - set to minimum size: 200KB.");
+			maxCacheSize = MIN_SIZE;
 		} else {
-			this.maxCacheSize = maxSize;
+			maxCacheSize = _maxSize;
 		}
-		cacheMap = new ConcurrentHashMap<K, V>(this.maxCacheSize/CONFERENCE_SUMMARY);
+		cacheMap = new ConcurrentHashMap<K, V>();
 		
-		if (this.maxCacheSize >= 1000000000)
-			logger.info("New " + type + " cache created (MaxSize: " + this.maxCacheSize/1000000000 + "GB; TimeOut: " + timeOut/1000 + 
-				"s; CleanInterval: " + cleanInterval/1000 + "s)");
-		else if (this.maxCacheSize >= 1000000)
-			logger.info("New " + type + " cache created (MaxSize: " + this.maxCacheSize/1000000 + "MB; TimeOut: " + timeOut/1000 + 
-					"s; CleanInterval: " + cleanInterval/1000 + "s)");
-		else if (this.maxCacheSize >= 1000)
-			logger.info("New " + type + " cache created (MaxSize: " + this.maxCacheSize/1000 + "KB; TimeOut: " + timeOut/1000 + 
-					"s; CleanInterval: " + cleanInterval/1000 + "s)");
+		String s = "";
+		if (maxCacheSize >= 1000000000)
+			s = new StringBuilder(Integer.toString(maxCacheSize/1000000000)).append("GB").toString();
+		else if (maxCacheSize >= 1000000)
+			s = new StringBuilder(Integer.toString(maxCacheSize/1000000)).append("MB").toString();
+		else if (maxCacheSize >= 1000)
+			s = new StringBuilder(Integer.toString(maxCacheSize/1000)).append("KB").toString();
 		else
-			logger.info("New " + type + " cache created (MaxSize: " + this.maxCacheSize + "B; TimeOut: " + timeOut/1000 + 
-					"s; CleanInterval: " + cleanInterval/1000 + "s)");
+			s = new StringBuilder(Integer.toString(maxCacheSize)).append("B").toString();
+		logger.info(new StringBuilder("New ").append(type).append(" cache created (MaxSize: ").append(s).append("; TimeOut: ")
+				.append(Long.toString(timeOut/1000)).append("s; CleanInterval: ").append(Long.toString(_cleanInterval/1000)).append("s)"));
 		
 		Thread t = new Thread(new Runnable() {
 			public void run() {
 				while (true) {
 					try {
-						Thread.sleep(cleanInterval);
+						Thread.sleep(_cleanInterval);
 					} catch (InterruptedException e) {
 						logger.error("Thread for waiting to clean up cache interrupted.");
 					}
@@ -124,17 +123,17 @@ public class Cache<K, V> implements ICache<K, V> {
 		}
 		
 		int newCacheObjSize = mapCacheObjectSize(key, value);
-		int tempCacheSize = this.usedCacheSize + newCacheObjSize;
+		int tempCacheSize = usedCacheSize + newCacheObjSize;
 		
-		while (tempCacheSize >= this.maxCacheSize) {
+		while (tempCacheSize >= maxCacheSize) {
 			K keyToRemove = null;
 			
 			if (type.equalsIgnoreCase("LRU")) {
 				keyToRemove = findLruKey();
-				logger.warn("LRU Cache is full. Replace item with key: " + keyToRemove.toString());
+				logger.warn(new StringBuilder("LRU Cache is full. Replace item with key: ").append(keyToRemove.toString()));
 			} else if (type.equalsIgnoreCase("LFU")) {
 				keyToRemove = findLfuKey();
-				logger.warn("LFU Cache is full. Replace item with key: " + keyToRemove.toString());
+				logger.warn(new StringBuilder("LFU Cache is full. Replace item with key: ").append(keyToRemove.toString()));
 			}
 			
 			// remove cache item in cache
@@ -146,8 +145,8 @@ public class Cache<K, V> implements ICache<K, V> {
 		
 		cacheMap.putIfAbsent(key, value);
 		
-		this.usedCacheSize = tempCacheSize;
-		logger.info("Added new cache item, cache size: " + this.usedCacheSize + " bytes.");
+		usedCacheSize = tempCacheSize;
+		logger.info(new StringBuilder("Added new cache item, cache size: ").append(Integer.toString(usedCacheSize)).append(" bytes."));
 	}
 
 	@Override
@@ -159,8 +158,8 @@ public class Cache<K, V> implements ICache<K, V> {
 		
 		cacheMap.remove(key);
 		
-		this.usedCacheSize -= mapCacheObjectSize(key, cacheMap.get(key));
-		logger.info("Removed cache item, cache size: " + this.usedCacheSize + " bytes.");
+		usedCacheSize -= mapCacheObjectSize(key, cacheMap.get(key));
+		logger.info(new StringBuilder("Removed cache item, cache size: ").append(Integer.toString(usedCacheSize)).append(" bytes."));
 	}
 	
 	@Override
@@ -182,7 +181,7 @@ public class Cache<K, V> implements ICache<K, V> {
 			key = e.getKey();
 			
 			if (time > (((CacheItem<?>) e.getValue()).getTimeStamp() + timeOut)) {
-				logger.warn("Cache " + key + " expired.");
+				logger.warn(new StringBuilder("Cache ").append(key).append(" expired."));
 				cacheMap.remove(key);
 			}
 		}

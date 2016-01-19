@@ -49,7 +49,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 			
 			if (updatedConfIds.containsKey("newConfIds")) {
 				List<String> newConfIds = updatedConfIds.get("newConfIds");
-				logger.info("Found " + newConfIds.size() + " new conference(s) to process.");
+				logger.info(new StringBuilder("Found ").append(Integer.toString(newConfIds.size())).append(" new conference(s) to process."));
 				
 				List<ConferenceScore> confScores = new ArrayList<ConferenceScore>();
 				ConferenceScore confScore = new ConferenceScore(0, 0);
@@ -87,7 +87,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 			
 			if (updatedConfIds.containsKey("oldConfIds")) {
 				List<String> oldConfIds = updatedConfIds.get("oldConfIds");
-				logger.info("Found " + oldConfIds.size() + " deprecated conferences.");
+				logger.info(new StringBuilder("Found ").append(Integer.toString(oldConfIds.size())).append(" deprecated conferences."));
 				
 				for (String oldConfId : oldConfIds) {
 					
@@ -133,8 +133,10 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		
 		for (int i=0; i<size; i++) {
 			String confId = confIds.get(i);
-			conferenceItems[i] = confId + ", " + ldc.findConferenceTimestamp(confId) + ", " + ldc.findConfChannels(confId).size() + ", " +
-					Integer.toString(confScores.get(i).getAvgPLIndicator()) + ", " + Integer.toString(confScores.get(i).getAvgLevelIndicator());
+			conferenceItems[i] = new StringBuilder(confId).append(", ").append(ldc.findConferenceTimestamp(confId))
+					.append(", ").append(Integer.toString(ldc.findConfChannels(confId).size())).append(", ")
+					.append(Integer.toString(confScores.get(i).getAvgPLIndicator())).append(", ")
+					.append(Integer.toString(confScores.get(i).getAvgLevelIndicator())).toString();
 		}
 		
 		if (ldc.writeFile("conference", conferenceItems))
@@ -157,8 +159,10 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		String[] channelItems = new String[size];
 		
 		for (int i=0; i<size; i++) {
-			channelItems[i] = confId + ", " + channels.get(i).getUuid() + ", " + Integer.toString(chanScores.get(i).getAvgPLIndicator()) + ", " +
-					Integer.toString(chanScores.get(i).getAvgLevelIndicator()) + ", " + Double.toString(chanScores.get(i).getAvgPacketLoss());
+			channelItems[i] = new StringBuilder(confId).append(", ").append(channels.get(i).getUuid()).append(", ")
+					.append(Integer.toString(chanScores.get(i).getAvgPLIndicator())).append(", ")
+					.append(Integer.toString(chanScores.get(i).getAvgLevelIndicator())).append(", ")
+					.append(Double.toString(chanScores.get(i).getAvgPacketLoss())).toString();
 		}
 		
 		if (ldc.writeFile("channel", channelItems))
@@ -381,64 +385,80 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 	}
 	
 	private void removeConfernceFromCache(String oldConfId) {
+		String rm = " in cache removed.";
+		String ocs = new StringBuilder(oldConfId).append("_summary").toString();
+		String ocd = new StringBuilder(oldConfId).append("_details").toString();
+		String occ = new StringBuilder(oldConfId).append("_channels").toString();
+		
 		// remove conference summary cache
-		if (Main.cache.contains(oldConfId+"_summary")) {
-			Main.cache.remove(oldConfId+"_summary");
-			logger.info(oldConfId + "_summary in cache removed.");
+		if (Main.cache.contains(ocs)) {
+			Main.cache.remove(ocs);
+			logger.info(new StringBuilder(ocs).append(rm));
 		}
 		
 		// remove conference details cache
-		if (Main.cache.contains(oldConfId+"_details")) {
-			Main.cache.remove(oldConfId+"_details");
-			logger.info(oldConfId + "_details in cache removed.");
+		if (Main.cache.contains(ocd)) {
+			Main.cache.remove(ocd);
+			logger.info(new StringBuilder(ocd).append(rm));
 		}
 		
 		// remove conference channels cache
-		if (Main.cache.contains(oldConfId+"_channels")) {
-			Main.cache.remove(oldConfId+"_channels");
-			logger.info(oldConfId + "_channels in cache removed.");
+		if (Main.cache.contains(occ)) {
+			Main.cache.remove(occ);
+			logger.info(new StringBuilder(occ).append(rm));
 		}
 		
 		// remove each channel cache of this conference
 		List<String> channelIds = ldc.getConfChannelIds(oldConfId);
 		for (String channelId : channelIds) {
-			if (Main.cache.contains(channelId+"_summary")) {
-				Main.cache.remove(channelId+"_summary");
-				logger.info(channelId + "_summary in cache removed.");
+			String cs = new StringBuilder(channelId).append("_summary").toString();
+			String cd = new StringBuilder(channelId).append("_details").toString();
+			
+			if (Main.cache.contains(cs)) {
+				Main.cache.remove(cs);
+				logger.info(new StringBuilder(cs).append(rm));
 			}
 			
-			if (Main.cache.contains(channelId+"_details")) {
-				Main.cache.remove(channelId+"_details");
-				logger.info(channelId + "_details in cache removed.");
+			if (Main.cache.contains(cd)) {
+				Main.cache.remove(cd);
+				logger.info(new StringBuilder(cd).append(rm));
 			}
 		}
 	}
 	
 	private void updateConfScoreInCache(String confId, ConferenceScore confScore) {
+		String ud = " in cache score udpated.";
+		String cs = new StringBuilder(confId).append("_summary").toString();
+		String cd = new StringBuilder(confId).append("_details").toString();
+		
 		// update conference summary cache with new score
-		if (Main.cache.contains(confId + "_summary")) {
-			((LocalDbConference) ((CacheItem<?>) Main.cache.get(confId + "_summary")).getCacheObject()).setScore(confScore);
-			logger.info(confId + "_summary in cache score updated.");
+		if (Main.cache.contains(cs)) {
+			((LocalDbConference) ((CacheItem<?>) Main.cache.get(cs)).getCacheObject()).setScore(confScore);
+			logger.info(new StringBuilder(cs).append(ud));
 		}
 		
 		// update conference details cache with new score
-		if (Main.cache.contains(confId + "_details")) {
-			((LocalDbConference) ((CacheItem<?>) Main.cache.get(confId + "_details")).getCacheObject()).setScore(confScore);
-			logger.info(confId + "_details in cache score updated.");
+		if (Main.cache.contains(cd)) {
+			((LocalDbConference) ((CacheItem<?>) Main.cache.get(cd)).getCacheObject()).setScore(confScore);
+			logger.info(new StringBuilder(cd).append(ud));
 		}
 	}
 	
-	private void updateChanScoreInCache(String channelId, ChannelScore chanScore) {
+	private void updateChanScoreInCache(String chanId, ChannelScore chanScore) {
+		String ud = " in cache score udpated.";
+		String cs = new StringBuilder(chanId).append("_summary").toString();
+		String cd = new StringBuilder(chanId).append("_details").toString();
+		
 		// update channel summary cache with new score
-		if (Main.cache.contains(channelId + "_summary")) {
-			((LocalDbChannel) ((CacheItem<?>) Main.cache.get(channelId + "_summary")).getCacheObject()).setScore(chanScore);
-			logger.info(channelId + "_summary in cache score updated.");
+		if (Main.cache.contains(cs)) {
+			((LocalDbChannel) ((CacheItem<?>) Main.cache.get(cs)).getCacheObject()).setScore(chanScore);
+			logger.info(new StringBuilder(cs).append(ud));
 		}
 		
 		// update channel details cache with new score
-		if (Main.cache.contains(channelId + "_details")) {
-			((LocalDbChannel) ((CacheItem<?>) Main.cache.get(channelId + "_details")).getCacheObject()).setScore(chanScore);
-			logger.info(channelId + "_details in cache score updated.");
+		if (Main.cache.contains(cd)) {
+			((LocalDbChannel) ((CacheItem<?>) Main.cache.get(cd)).getCacheObject()).setScore(chanScore);
+			logger.info(new StringBuilder(cd).append(ud));
 		}
 	}
 
