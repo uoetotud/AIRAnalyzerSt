@@ -351,6 +351,15 @@ public class TestDtCollector {
 		conf = dc.getConferenceDetails("00000000-0000-0000-000000000000000B");
 		assertNotNull(conf);
 		assertNotNull(conf.getStats());
+		assertNotNull(conf.getStats().getMixerSum());
+		
+		assertNotNull(conf.getStats().getMixerSum().getQuantum());
+		assertNotNull(conf.getStats().getMixerSum().getNConferenceId());
+		assertNotNull(conf.getStats().getMixerSum().getNSpeakers());
+		assertNotNull(conf.getStats().getMixerSum().getSpeaker1());
+		assertNotNull(conf.getStats().getMixerSum().getSpeaker2());
+		assertNotNull(conf.getStats().getMixerSum().getSpeaker3());
+		assertNotNull(conf.getStats().getMixerSum().getSpeaker4());
 		
 		// fetch from cache
 		conf = dc.getConferenceDetails("00000000-0000-0000-000000000000000B");

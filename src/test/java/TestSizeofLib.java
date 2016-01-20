@@ -38,6 +38,7 @@ public class TestSizeofLib {
 	}
 	
 	@Test
+	@Ignore
 	public void getPrimitiveSize() {
 		System.out.println("** Get primitives sizes **");
 		
@@ -63,8 +64,8 @@ public class TestSizeofLib {
 	public void getJavaObjectSize() {
 		System.out.println("** Get java objects sizes **");
 		
-		String confId = "00000000-0000-0000-0000000000000000";
-		String chanId = "C05C1C75-8DDF-4906-9C9CC69277926064";
+		String confId = "00000000-0000-0000-000000000000000J";
+		String chanId = "E0EA6DAF-3504-47DB-8FEB4EEBFC336C59";
 		LocalDateTime time = LocalDateTime.now();
 		
 		System.out.println("LocalDateTime: " + RamUsageEstimator.sizeOf(time) + " bytes.");
@@ -79,13 +80,13 @@ public class TestSizeofLib {
 		
 		List<LocalDbConference> confList = dc.getConferenceList("all", "any", "any");
 		
-		LocalDbConference confSum = dc.getConferenceSummary("00000000-0000-0000-0000000000000000");
-		LocalDbConference confDet = dc.getConferenceDetails("00000000-0000-0000-0000000000000000");
+		LocalDbConference confSum = dc.getConferenceSummary("00000000-0000-0000-000000000000000J");
+		LocalDbConference confDet = dc.getConferenceDetails("00000000-0000-0000-000000000000000J");
 		
-		List<LocalDbChannel> chanList = dc.getConfChannels("00000000-0000-0000-0000000000000000");
+		List<LocalDbChannel> chanList = dc.getConfChannels("00000000-0000-0000-000000000000000J");
 		
-		LocalDbChannel chanSum = dc.getChannelSummary("C05C1C75-8DDF-4906-9C9CC69277926064");
-		LocalDbChannel chanDet = dc.getChannelDetails("C05C1C75-8DDF-4906-9C9CC69277926064");
+		LocalDbChannel chanSum = dc.getChannelSummary("E0EA6DAF-3504-47DB-8FEB4EEBFC336C59");
+		LocalDbChannel chanDet = dc.getChannelDetails("E0EA6DAF-3504-47DB-8FEB4EEBFC336C59");
 		
 		System.out.println("conference list: " + RamUsageEstimator.sizeOf(confList) + " bytes.");
 		System.out.println("conference summary: " + RamUsageEstimator.sizeOf(confSum) + " bytes.");

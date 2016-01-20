@@ -627,7 +627,8 @@ public class LocalDbContainer implements IDbConnector {
 				.append(getFileNameFromId(folderPath, "", "mixersum").get(0)).toString(), ",", maxStatsReadLine));
 		
 		if (mixSumData != null && !mixSumData.isEmpty())
-			ms = new MixerSum(mixSumData.get("quantum"), mixSumData.get("nConferenceId"), mixSumData.get("nSpeakers"));
+			ms = new MixerSum(mixSumData.get("quantum"), mixSumData.get("nConferenceId"), mixSumData.get("nSpeakers")
+					, mixSumData.get("Speaker1"), mixSumData.get("Speaker2"), mixSumData.get("Speaker3"), mixSumData.get("Speaker4"));
 		else
 			logger.warn("Cannot find Mixer data.");
 		if (ms != null)

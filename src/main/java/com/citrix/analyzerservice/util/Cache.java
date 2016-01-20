@@ -13,19 +13,12 @@ public class Cache<K, V> implements ICache<K, V> {
 	private static final Logger logger = Logger.getLogger(Cache.class);
 	
 	// define cache objects sizes
-//	private static final int CONFERENCE_SUMMARY = 1123;
-//	private static final int CONFERENCE_DETAILS = 174029;
-//	private static final int CHANNEL_SUMMARY = 298;
-//	private static final int CHANNEL_DETAILS = 173213;
-//	private static final int MAX_SIZE = 1000000000;
-	
-	// ONLY for testing purpose...
-	private static final int CONFERENCE_SUMMARY = 1200;
-	private static final int CONFERENCE_DETAILS = 180000;
+	private static final int CONFERENCE_SUMMARY = 1300;
+	private static final int CONFERENCE_DETAILS = 150000;
 	private static final int CHANNEL_SUMMARY = 300;
-	private static final int CHANNEL_DETAILS = 175000;
+	private static final int CHANNEL_DETAILS = 1210000;
 	private static final int MAX_SIZE = 300000000;
-	private static final int MIN_SIZE = 200000;
+	private static final int MIN_SIZE = 2000000;
 	
 	private String type = "";
 	private long timeOut = 0;
@@ -44,7 +37,7 @@ public class Cache<K, V> implements ICache<K, V> {
 			logger.warn("Cache size cannot be configured larger than 1GB - set to maximum size: 1GB.");
 			maxCacheSize = MAX_SIZE;
 		} else if (_maxSize < MIN_SIZE){
-			logger.warn("Cache size cannot be configured smaller than 200KB - set to minimum size: 200KB.");
+			logger.warn("Cache size cannot be configured smaller than 2MB - set to minimum size: 2MB.");
 			maxCacheSize = MIN_SIZE;
 		} else {
 			maxCacheSize = _maxSize;

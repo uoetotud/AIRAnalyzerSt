@@ -171,13 +171,6 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		if (channelIds.size() != chanScores.size())
 			return false;
 		
-//		List<LocalDbChannel> channels = ldc.findConfChannels(confId);
-//		if (channels == null || channels.isEmpty())
-//			return false;
-//		
-//		if (channels.size() != chanScores.size())
-//			return false;
-		
 		int size = channelIds.size();
 		String[] channelItems = new String[size];
 		

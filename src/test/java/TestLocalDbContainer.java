@@ -9,7 +9,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.citrix.analyzerservice.Main;
@@ -45,11 +44,11 @@ public class TestLocalDbContainer {
 	}
 
 	/*
-	 * Pre-condition: folder has conference 0, 1, 2, but none is processed
-	 * Post-condition: folder has conference 0, 1, and both are processed
+	 * Pre-condition: folder has 10 conferences 0A ~ 0J but none is processed
+	 * Post-condition: folder has 9 conferences 0A ~ 0I, all are processed and stored in newly created ConfList.txt and ChanList.txt
 	 * */
 	@Test
-	@Ignore
+//	@Ignore
 	public void testFindUpdatedConfIds() throws InterruptedException {
 		System.out.println("\n** Get updated conference IDs **");
 		
@@ -59,7 +58,7 @@ public class TestLocalDbContainer {
 		// get new confIds before processing
 		updatedConfIds = ldc.findUpdatedConfIds();
 		int size = updatedConfIds.get("newConfIds").size();
-		assertEquals(size, 3);
+		assertEquals(size, 10);
 		System.out.println("Found " + size + " new conference(s):");
 		for (int i=0; i<size; i++)
 			System.out.println(updatedConfIds.get("newConfIds").get(i));
@@ -74,10 +73,10 @@ public class TestLocalDbContainer {
 		System.out.println("Found no new conference(s).");
 		
 		/* test conferences removed */
-		System.out.println("\nNow remove conference 22222222-2222-2222-2222222222222222...");
+		System.out.println("\nNow remove conference 00000000-0000-0000-000000000000000J...");
 		
 		// remove conference
-		String confPath = path + "150508-092531-conference_22222222-2222-2222-2222222222222222";
+		String confPath = path + "conference_00000000-0000-0000-000000000000000J-160119-075933";
 		File oldConf = new File(confPath);
 		String[] files = oldConf.list();
 		for (String f : files) {
@@ -91,7 +90,7 @@ public class TestLocalDbContainer {
 		updatedConfIds = ldc.findUpdatedConfIds();
 		size = updatedConfIds.get("oldConfIds").size();
 		assertEquals(size, 1);
-		System.out.println("Found " + size + " removed conference(s): " + updatedConfIds.get("oldConfIds").get(0));
+		System.out.println("Found " + size + " removed conference(s):\n" + updatedConfIds.get("oldConfIds").get(0));
 		
 		// invoke processor to update list files
 		dp.run();
@@ -104,7 +103,6 @@ public class TestLocalDbContainer {
 	}
 	
 	@Test
-	@Ignore
 	public void testReadWriteUpdateFile() {
 		System.out.println("\n** Read/Write/Update file **");
 
@@ -162,8 +160,8 @@ public class TestLocalDbContainer {
 		
 		System.out.println("\n** Find channel timestamp **");
 		
-		LocalDateTime chanTS = ldc.findChannelTimestamp("00000000-0000-0000-000000000000000A", "3C5E66C8-F511-4A8B-99C6FF45C0797812");
-		assertEquals(chanTS.toString(), "2016-01-18T14:53:28");
-		System.out.println("Channel 3C5E66C8-F511-4A8B-99C6FF45C0797812 timestamp: " + chanTS);
+		LocalDateTime chanTS = ldc.findChannelTimestamp("00000000-0000-0000-000000000000000B", "BE39CB80-0144-4871-B5FC460E2A882A7F");
+		assertEquals(chanTS.toString(), "2016-01-19T07:20:44");
+		System.out.println("Channel BE39CB80-0144-4871-B5FC460E2A882A7F timestamp: " + chanTS);
 	}
 }
