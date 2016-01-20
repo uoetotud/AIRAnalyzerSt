@@ -12,13 +12,14 @@ public interface IDbConnector {
 	
 	List<LocalDbConference> findConferenceList();
 	
-	LocalDbConference findConference(String confId, boolean showAll);
-	LocalDateTime findConferenceTimestamp(String folder);	
+	LocalDbConference findConference(String confId, boolean showAll);	
 	List<LocalDbChannel> findConfChannels(String folderPath);
-	List<String> getConfChannelIds(String path);
+	LocalDateTime findConferenceTimestamp(String folder);
+	List<String> findConfChannelIds(String path);
 	
 	LocalDbChannel findChannel(String confId, String chanId, boolean showAll);
 	ChannelStats findChannelStats(String confId, String chanId);
+	LocalDateTime findChannelTimestamp(String confId, String chanId);
 	
 	List<List<String>> readFile(String path, String delimiter, String size);
 	boolean writeFile(String type, String[] content);	

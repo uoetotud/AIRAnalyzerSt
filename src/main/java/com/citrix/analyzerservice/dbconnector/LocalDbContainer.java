@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +21,8 @@ import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ChannelStats;
 import com.citrix.analyzerservice.model.ConferenceScore;
 import com.citrix.analyzerservice.model.ConferenceStats;
-import com.citrix.analyzerservice.model.Mixer;
+import com.citrix.analyzerservice.model.MixerOut;
+import com.citrix.analyzerservice.model.MixerSum;
 import com.citrix.analyzerservice.model.StreamEnhancer;
 import com.citrix.analyzerservice.model.StreamProcessor;
 
@@ -42,12 +42,12 @@ public class LocalDbContainer implements IDbConnector {
 		List<String> newConfIds = new ArrayList<String>();
 		List<String> oldConfIds = new ArrayList<String>();
 		
-		List<String> allConfIds = findAllConfIds(defaultPath);
+		List<String> allConfIds = getAllConfIds(defaultPath);
 		if (allConfIds == null || allConfIds.isEmpty()) {
 			logger.warn("No conference found in system.");
 		}
 		
-		List<String> proConfIds = findProConfIds(new StringBuilder(defaultPath).append("ConfList.txt").toString());
+		List<String> proConfIds = getProConfIds(new StringBuilder(defaultPath).append("ConfList.txt").toString());
 		if (proConfIds == null || proConfIds.isEmpty()) {
 			logger.warn("No conference found in list.");
 		}
@@ -71,7 +71,7 @@ public class LocalDbContainer implements IDbConnector {
 	
 	@Override
 	public List<LocalDbConference> findConferenceList() {
-		List<String> confIds = findAllConfIds(defaultPath);
+		List<String> confIds = getAllConfIds(defaultPath);
 		if (confIds == null || confIds.isEmpty()) {
 			logger.warn("No conference found.");
 			return new ArrayList<LocalDbConference>();
@@ -141,12 +141,60 @@ public class LocalDbContainer implements IDbConnector {
 		}
 			
 		List<LocalDbChannel> channels = new ArrayList<LocalDbChannel>();
-		List<String> channelIds = getConfChannelIds(confId);
+		List<String> channelIds = findConfChannelIds(confId);
 		
 		if (channelIds != null && !channelIds.isEmpty())
 			for (String channelId : channelIds) {
 				channels.add(findChannel(confId, channelId, false));
 			}
+		
+		return channels;
+	}
+	
+	@Override
+	public LocalDateTime findConferenceTimestamp(String folder) {
+		
+		// if confId instead of folderPath is passed in
+		if (folder.length() < 50) {
+			logger.trace("Received conference uuid to find conference timestamp, getting it's path...");
+			String confId = folder;
+			List<String> folders = getFileNameFromId(defaultPath, confId, "folder");
+			if (folder.isEmpty()) {
+				logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
+				return null;
+			}
+			
+			folder = folders.get(0);
+		}
+		
+		String dateTimeStr = new StringBuilder(Integer.toString(20)).append(folder.substring(47)).toString();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+		LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, formatter);
+		
+		return dateTime;
+	}
+	
+	@Override
+	public List<String> findConfChannelIds(String confId) {
+		List<String> channels = new ArrayList<String>();
+		
+		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
+		if (folder.isEmpty()) {
+			logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
+			return null;
+		}
+		
+		File path = new File(new StringBuilder(defaultPath).append(folder.get(0)).toString());
+		File[] fileLists = path.listFiles();
+		
+		if (fileLists.length <= 0) {
+			logger.error(new StringBuilder("Cannot find channels in conference through ").append(path).append('.'));
+			return null;
+		}
+		
+		for (int i=0; i<fileLists.length; i++)
+			if (fileLists[i].isFile() && fileLists[i].getName().startsWith("MixerInChannel"))
+				channels.add(fileLists[i].getName().substring(37, 72));
 		
 		return channels;
 	}
@@ -188,7 +236,7 @@ public class LocalDbContainer implements IDbConnector {
 			logger.debug(new StringBuilder("Fetching channel ").append(chanId).append(" statistics..."));
 			List<String> files = getFileNameFromId(folderPath, chanId, "file");
 			if (files != null && !files.isEmpty())
-				stats = findChannelStats(folderPath, files);
+				stats = getChannelStats(folderPath, files);
 			else
 				logger.error(new StringBuilder("Cannot find channel ").append(chanId).append(" statistics."));
 		}
@@ -226,12 +274,41 @@ public class LocalDbContainer implements IDbConnector {
 			return null;
 		}
 		
-		ChannelStats stats = findChannelStats(folderPath, files);
+		ChannelStats stats = getChannelStats(folderPath, files);
 		
 		return stats;
 	}
 	
-	private ChannelStats findChannelStats(String folderPath, List<String> files) {
+	@Override
+	public LocalDateTime findChannelTimestamp(String confId, String chanId) {
+		
+		if (confId == null || confId.length() <= 0 || chanId == null || chanId.length() <= 0) {
+			logger.error("Please provide conference and channel uuid.");
+			return null;
+		}
+		
+		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
+		if (folder.isEmpty()) {
+			logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
+			return null;
+		}
+		
+		String folderPath = new StringBuilder(defaultPath).append(folder.get(0)).toString();		
+		List<String> files = getFileNameFromId(folderPath, chanId, "file");
+		if (files == null || files.isEmpty()) {
+			logger.error(new StringBuilder("Cannot find channel ").append(chanId).append('.'));
+			return null;
+		}
+		
+		int index = files.get(0).length()-17;
+		String dateTimeStr = new StringBuilder(Integer.toString(20)).append(files.get(0).substring(index, index+13)).toString();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+		LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, formatter);
+		
+		return dateTime;
+	}
+	
+	private ChannelStats getChannelStats(String folderPath, List<String> files) {
 		
 		if (files.isEmpty()) {
 			logger.error("Conference folder is empty.");
@@ -243,21 +320,54 @@ public class LocalDbContainer implements IDbConnector {
 		
 		ChannelStats stats = null;
 		StreamProcessor sp = null;
+		StreamEnhancer se = null;
+		MixerOut mo = null;
 		Map<String, double[]> strProData = new HashMap<String, double[]>();
-//		Map<String, double[]> strEnhData = null;
+		Map<String, double[]> strEnhData = new HashMap<String, double[]>();
+		Map<String, double[]> mixOutData = new HashMap<String, double[]>();
 		
 		for (int i=0; i<files.size(); i++) {
-			strProData = convertDataStructure(readFile(new StringBuilder(folderPath).append("/").append(files.get(i)).toString(), ",", maxStatsReadLine));
-//			strEnhData = convertDataStructure(readFile(path, ","));
+			String fileName = files.get(i);
+			if (fileName.contains("StreamProcessor"))
+				strProData = convertDataStructure(readFile(new StringBuilder(folderPath).append("/").append(fileName).toString(), ",", maxStatsReadLine));
+			if (fileName.contains("StreamEnhancer"))
+				strEnhData = convertDataStructure(readFile(new StringBuilder(folderPath).append("/").append(fileName).toString(), ",", maxStatsReadLine));
+			if (fileName.contains("MixerOutChannel"))
+				mixOutData = convertDataStructure(readFile(new StringBuilder(folderPath).append("/").append(fileName).toString(), ",", maxStatsReadLine));
 		}
 		
-		if (strProData != null && !strProData.isEmpty())
-			sp = new StreamProcessor(strProData.get("SeqNr"), strProData.get("NS_speechPowerOut"), strProData.get("NS_noisePowerOut"));
-		else
+		if (strProData != null && !strProData.isEmpty()) {
+			sp = new StreamProcessor(strProData.get("SeqNr"), strProData.get("muted"), strProData.get("RTP_streamBegin"), 
+					strProData.get("RTP_isDelayed"), strProData.get("RTP_isReordered"), strProData.get("TimeStamp"), 
+					strProData.get("Media_BufSize"), strProData.get("IATJitter"), strProData.get("NS_speechPowerIn"), 
+					strProData.get("NS_speechPowerOut"), strProData.get("NS_noisePowerIn"), strProData.get("NS_noisePowerOut"), 
+					strProData.get("AGC_speechLevelOut"), strProData.get("AGC_noiseLevelOut"), strProData.get("AGC_vadState"));
+		} else {
 			logger.warn("Cannot find StreamProcessor data.");
-		StreamEnhancer se = null;
-		if (sp != null)
-			stats = new ChannelStats(sp, se);
+			sp = new StreamProcessor(new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, 
+					new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, 
+					new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, 
+					new double[] {-999999}, new double[] {-999999}, new double[] {-999999});
+		}
+		
+		if (strEnhData != null && !strEnhData.isEmpty()) {
+			se = new StreamEnhancer(strEnhData.get("QNr"), strEnhData.get("QuantumsInJitterBuffer[Q]"), strEnhData.get("PacketScaleFast"), 
+					strEnhData.get("PacketScaleSlow"), strEnhData.get("PacketScaleFactor"), strEnhData.get("QuantumUnderrunCounter [Q]"), 
+					strEnhData.get("QuantumType"), strEnhData.get("PopTimeDelta"));
+		} else {
+			logger.warn("Cannot find StreamEnhancer data.");
+			se = new StreamEnhancer(new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, 
+					new double[] {-999999}, new double[] {-999999}, new double[] {-999999}, new double[] {-999999});
+		}
+		
+		if (mixOutData != null && !mixOutData.isEmpty()) {
+			mo = new MixerOut(mixOutData.get("seqNo"), mixOutData.get("timestamp"));
+		} else {
+			logger.warn("Cannot find MixerOut data.");
+			mo = new MixerOut(new double[] {-999999}, new double[] {-999999});
+		}
+		
+		stats = new ChannelStats(sp, se, mo);
 		
 		return stats;
 	}
@@ -396,19 +506,20 @@ public class LocalDbContainer implements IDbConnector {
 		return false;
 	}
 	
-	private List<String> findAllConfIds(String path) {
+	private List<String> getAllConfIds(String path) {
 		List<String> confs = getFolderNames(path);
 		List<String> confIds = new ArrayList<String>();
 		
 		for (int i=0; i<confs.size(); i++) {
 			String confName = confs.get(i);
-			confIds.add(confName.substring(confName.indexOf('_')+1));
+			int indexOfConfId = confName.indexOf('_')+1;
+			confIds.add(confName.substring(indexOfConfId, indexOfConfId+35));
 		}
 		
 		return confIds;
 	}
 	
-	private List<String> findProConfIds(String path) {
+	private List<String> getProConfIds(String path) {
 		List<String> confIds = new ArrayList<String>();
 		
 		BufferedReader br = null;
@@ -471,7 +582,7 @@ public class LocalDbContainer implements IDbConnector {
 			if (type.equalsIgnoreCase("file"))
 				if (fileLists[i].isFile() && fileLists[i].getName().contains(uuid) && fileLists[i].getName().endsWith(".txt"))
 					files.add(fileLists[i].getName());
-			if (type.equalsIgnoreCase("mixer"))
+			if (type.equalsIgnoreCase("mixersum"))
 				if (fileLists[i].isFile() && fileLists[i].getName().contains("MixerSumStream") && fileLists[i].getName().endsWith(".txt"))
 					files.add(fileLists[i].getName()); 
 		}
@@ -480,7 +591,7 @@ public class LocalDbContainer implements IDbConnector {
 	}
 	
 	private Map<String, double[]> convertDataStructure(List<List<String>> data) {
-		Map<String, double[]> convertedData = new LinkedHashMap<String, double[]>();
+		Map<String, double[]> convertedData = new HashMap<String, double[]>();
 		int dataRowNo = data.size();
 		int dataColNo = data.get(0).size();
 		int i = 0;
@@ -500,54 +611,6 @@ public class LocalDbContainer implements IDbConnector {
 		return convertedData;
 	}
 	
-	@Override
-	public List<String> getConfChannelIds(String confId) {
-		List<String> channels = new ArrayList<String>();
-		
-		List<String> folder = getFileNameFromId(defaultPath, confId, "folder");
-		if (folder.isEmpty()) {
-			logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
-			return null;
-		}
-		
-		File path = new File(new StringBuilder(defaultPath).append(folder.get(0)).toString());
-		File[] fileLists = path.listFiles();
-		
-		if (fileLists.length <= 0) {
-			logger.error(new StringBuilder("Cannot find channels in conference through ").append(path).append('.'));
-			return null;
-		}
-		
-		for (int i=0; i<fileLists.length; i++)
-			if (fileLists[i].isFile() && fileLists[i].getName().startsWith("MixerInChannel"))
-				channels.add(fileLists[i].getName().substring(37, 72));
-		
-		return channels;
-	}
-	
-	@Override
-	public LocalDateTime findConferenceTimestamp(String folder) {
-		
-		// if confId instead of folderPath is passed in
-		if (folder.length() < 50) {
-			logger.trace("Received conference uuid to find conference timestamp, getting it's path...");
-			String confId = folder;
-			List<String> folders = getFileNameFromId(defaultPath, confId, "folder");
-			if (folder.isEmpty()) {
-				logger.error(new StringBuilder("Cannot find conference ").append(confId).append('.'));
-				return null;
-			}
-			
-			folder = folders.get(0);
-		}
-		
-		String dateTimeStr = new StringBuilder(Integer.toString(20)).append(folder.substring(0, 13)).toString();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-		LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, formatter);
-		
-		return dateTime;
-	}
-	
 	private ConferenceStats getConferenceStats(String folderPath) {
 		
 		if (folderPath == null || folderPath.length() <= 0)
@@ -557,18 +620,18 @@ public class LocalDbContainer implements IDbConnector {
 			maxStatsReadLine = "all";
 		
 		ConferenceStats stats = null;
-		Mixer m = null;
-		Map<String, double[]> mixData = null;
+		MixerSum ms = null;
+		Map<String, double[]> mixSumData = null;
 
-		mixData = convertDataStructure(readFile(new StringBuilder(folderPath).append('/')
-				.append(getFileNameFromId(folderPath, "", "mixer").get(0)).toString(), ",", maxStatsReadLine));
+		mixSumData = convertDataStructure(readFile(new StringBuilder(folderPath).append('/')
+				.append(getFileNameFromId(folderPath, "", "mixersum").get(0)).toString(), ",", maxStatsReadLine));
 		
-		if (mixData != null && !mixData.isEmpty())
-			m = new Mixer(mixData.get("quantum"), mixData.get("nConferenceId"), mixData.get("nSpeakers"));
+		if (mixSumData != null && !mixSumData.isEmpty())
+			ms = new MixerSum(mixSumData.get("quantum"), mixSumData.get("nConferenceId"), mixSumData.get("nSpeakers"));
 		else
 			logger.warn("Cannot find Mixer data.");
-		if (m != null)
-			stats = new ConferenceStats(m);
+		if (ms != null)
+			stats = new ConferenceStats(ms);
 		
 		return stats;
 	}
@@ -594,11 +657,11 @@ public class LocalDbContainer implements IDbConnector {
 	}
 	
 	private String getChannelConference(String chanId) {
-		List<String> allConfIds = findAllConfIds(defaultPath);
+		List<String> allConfIds = getAllConfIds(defaultPath);
 		
 		for (int i=0; i<allConfIds.size(); i++) {
 			String confId = allConfIds.get(i);
-			List<String> channelIds = getConfChannelIds(confId);
+			List<String> channelIds = findConfChannelIds(confId);
 			for (String channelId : channelIds)
 				if (channelId.equals(chanId))
 					return confId;

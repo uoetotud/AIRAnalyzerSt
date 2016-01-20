@@ -52,21 +52,21 @@ public class TestDtCollector {
 		
 		// fetch from file
 		confList = dc.getConferenceList("all", "any", "any");
-		assertEquals(confList.size(), 3);
+		assertEquals(confList.size(), 10);
 		
 		// fetch from cache
 		confList = dc.getConferenceList("all", "any", "any");
-		assertEquals(confList.size(), 3);
+		assertEquals(confList.size(), 10);
 		
 		System.out.println("\n** Get conference list (all) without cache **");		
 		Main.cacheIsEnabled = false;
 		
 		// fetch from file twice
 		confList = dc.getConferenceList("all", "any", "any");
-		assertEquals(confList.size(), 3);
+		assertEquals(confList.size(), 10);
 		
 		confList = dc.getConferenceList("all", "any", "any");
-		assertEquals(confList.size(), 3);
+		assertEquals(confList.size(), 10);
 	}
 	
 	@Test
@@ -80,7 +80,7 @@ public class TestDtCollector {
 		
 		// fetch from cache
 		confList = dc.getConferenceList("all", "any", "any");
-		assertEquals(confList.size(), 3);
+		assertEquals(confList.size(), 10);
 		
 		// clear cache
 		Main.cache.clear();
@@ -88,7 +88,7 @@ public class TestDtCollector {
 		/* fetch more, then less */
 		// fetch from file
 		confList = dc.getConferenceList("all", "any", "any");
-		assertEquals(confList.size(), 3);
+		assertEquals(confList.size(), 10);
 		
 		// fetch from cache
 		confList = dc.getConferenceList("1", "any", "any");
@@ -103,12 +103,12 @@ public class TestDtCollector {
 		assertEquals(confList.size(), 1);
 
 		confList = dc.getConferenceList("all", "any", "any");
-		assertEquals(confList.size(), 3);
+		assertEquals(confList.size(), 10);
 		
 		/* fetch more, then less */
 		// fetch from file twice
 		confList = dc.getConferenceList("all", "any", "any");
-		assertEquals(confList.size(), 3);
+		assertEquals(confList.size(), 10);
 
 		confList = dc.getConferenceList("1", "any", "any");
 		assertEquals(confList.size(), 1);
@@ -124,24 +124,24 @@ public class TestDtCollector {
 		
 		/* fetch more, then less */
 		// fetch from file
-		confList = dc.getConferenceList("all", "20150507-0612", "any");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "20160118-0612", "any");
+		assertEquals(confList.size(), 10);
 		
 		// fetch from cache
-		confList = dc.getConferenceList("all", "20150507-1312", "any");
-		assertEquals(confList.size(), 2);
+		confList = dc.getConferenceList("all", "20160119-0739", "any");
+		assertEquals(confList.size(), 3);
 		
 		// clear cache
 		Main.cache.clear();
 		
 		/* fetch less, then more */
 		// fetch from file
-		confList = dc.getConferenceList("all", "20150507-1512", "any");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("all", "20160119-0739", "any");
+		assertEquals(confList.size(), 3);
 		
 		// fetch from cache
-		confList = dc.getConferenceList("all", "20150507-0612", "any");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "20160118-0612", "any");
+		assertEquals(confList.size(), 10);
 		
 		// clear cache
 		Main.cache.clear();
@@ -152,11 +152,11 @@ public class TestDtCollector {
 		
 		/* fetch more, then less */
 		// fetch from file
-		confList = dc.getConferenceList("all", "any", "20150509-0612");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "any", "20160120-0612");
+		assertEquals(confList.size(), 10);
 		
 		// fetch from cache
-		confList = dc.getConferenceList("all", "any", "20150507-1312");
+		confList = dc.getConferenceList("all", "any", "20160119-0612");
 		assertEquals(confList.size(), 1);
 		
 		// clear cache
@@ -164,12 +164,12 @@ public class TestDtCollector {
 		
 		/* fetch less, then more */
 		// fetch from file		
-		confList = dc.getConferenceList("all", "any", "20150508-0712");
-		assertEquals(confList.size(), 2);
+		confList = dc.getConferenceList("all", "any", "20160119-0732");
+		assertEquals(confList.size(), 5);
 		
 		// fetch from cache
-		confList = dc.getConferenceList("all", "any", "20150509-0612");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "any", "20160120-0612");
+		assertEquals(confList.size(), 10);
 		
 		// clear cache
 		Main.cache.clear();
@@ -180,23 +180,23 @@ public class TestDtCollector {
 		
 		/* fetch more, then less */
 		// fetch from file
-		confList = dc.getConferenceList("all", "20150507-0612", "20150509-0612");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "20160118-0612", "20160120-0612");
+		assertEquals(confList.size(), 10);
 		
 		// fetch from cache
-		confList = dc.getConferenceList("all", "20150507-1312", "20150508-0712");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("all", "20160119-0612", "20160119-0731");
+		assertEquals(confList.size(), 4);
 		
 		// clear cache
 		Main.cache.clear();
 		
 		// fetch from file
-		confList = dc.getConferenceList("all", "20150507-1312", "20150508-0712");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("all", "20160119-0612", "20160119-0750");
+		assertEquals(confList.size(), 6);
 		
 		// fetch from cache
-		confList = dc.getConferenceList("all", "20150507-0612", "20150509-0612");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "20160118-0612", "20160120-0612");
+		assertEquals(confList.size(), 10);
 		
 		System.out.println("\n** Get conference list by time filter without cache **");
 		Main.cacheIsEnabled = false;
@@ -207,19 +207,19 @@ public class TestDtCollector {
 		
 		/* fetch more, then less */
 		// fetch from file twice
-		confList = dc.getConferenceList("all", "20150507-0612", "any");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "20160118-0612", "any");
+		assertEquals(confList.size(), 10);
 
-		confList = dc.getConferenceList("all", "20150507-1312", "any");
-		assertEquals(confList.size(), 2);
+		confList = dc.getConferenceList("all", "20160119-0739", "any");
+		assertEquals(confList.size(), 3);
 		
 		/* fetch less, then more */
 		// fetch from file twice
-		confList = dc.getConferenceList("all", "20150507-1512", "any");
-		assertEquals(confList.size(), 1);
-
-		confList = dc.getConferenceList("all", "20150507-0612", "any");
+		confList = dc.getConferenceList("all", "20160119-0739", "any");
 		assertEquals(confList.size(), 3);
+
+		confList = dc.getConferenceList("all", "20160118-0612", "any");
+		assertEquals(confList.size(), 10);
 		
 		/*
 		 * Test "to"
@@ -227,19 +227,19 @@ public class TestDtCollector {
 		
 		/* fetch more, then less */
 		// fetch from file twice
-		confList = dc.getConferenceList("all", "any", "20150509-0612");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "any", "20160120-0612");
+		assertEquals(confList.size(), 10);
 
-		confList = dc.getConferenceList("all", "any", "20150507-1312");
+		confList = dc.getConferenceList("all", "any", "20160119-0612");
 		assertEquals(confList.size(), 1);
 		
 		/* fetch less, then more */
 		// fetch from file twice		
-		confList = dc.getConferenceList("all", "any", "20150508-0712");
-		assertEquals(confList.size(), 2);
+		confList = dc.getConferenceList("all", "any", "20160119-0732");
+		assertEquals(confList.size(), 5);
 
-		confList = dc.getConferenceList("all", "any", "20150509-0612");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "any", "20160120-0612");
+		assertEquals(confList.size(), 10);
 		
 		/*
 		 * Test both "from" and "to"
@@ -247,18 +247,18 @@ public class TestDtCollector {
 		
 		/* fetch more, then less */
 		// fetch from file twice
-		confList = dc.getConferenceList("all", "20150507-0612", "20150509-0612");
-		assertEquals(confList.size(), 3);
-
-		confList = dc.getConferenceList("all", "20150507-1312", "20150508-0712");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("all", "20160118-0612", "20160120-0612");
+		assertEquals(confList.size(), 10);
+		
+		confList = dc.getConferenceList("all", "20160119-0612", "20160119-0731");
+		assertEquals(confList.size(), 4);
 		
 		// fetch from file twice
-		confList = dc.getConferenceList("all", "20150507-1312", "20150508-0712");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("all", "20160119-0612", "20160119-0750");
+		assertEquals(confList.size(), 6);
 
-		confList = dc.getConferenceList("all", "20150507-0612", "20150509-0612");
-		assertEquals(confList.size(), 3);
+		confList = dc.getConferenceList("all", "20160118-0612", "20160120-0612");
+		assertEquals(confList.size(), 10);
 	}
 	
 	@Test
@@ -267,43 +267,43 @@ public class TestDtCollector {
 		
 		/* size range > time range */
 		// fetch from file
-		confList = dc.getConferenceList("2", "20150507-1500", "20150508-1200");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("8", "20160119-0612", "20160119-0742");
+		assertEquals(confList.size(), 6);
 		
 		// fetch from cache
-		confList = dc.getConferenceList("2", "20150507-1500", "20150508-1200");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("8", "20160119-0612", "20160119-0742");
+		assertEquals(confList.size(), 6);
 		
 		// clear cache
 		Main.cache.clear();
 		
 		/* size range < time range */
 		// fetch from file
-		confList = dc.getConferenceList("1", "20150507-0800", "20150508-0900");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("5", "20160119-0612", "20160119-0742");
+		assertEquals(confList.size(), 5);
 		
 		// fetch from cache
-		confList = dc.getConferenceList("1", "20150507-0800", "20150508-0900");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("5", "20160119-0612", "20160119-0742");
+		assertEquals(confList.size(), 5);
 		
 		System.out.println("\n** Get conference list by size and time filter without cache **");
 		Main.cacheIsEnabled = false;
 		
 		/* size range > time range */
 		// fetch from file twice
-		confList = dc.getConferenceList("2", "20150507-1500", "20150508-1200");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("8", "20160119-0612", "20160119-0742");
+		assertEquals(confList.size(), 6);
 		
-		confList = dc.getConferenceList("2", "20150507-1500", "20150508-1200");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("8", "20160119-0612", "20160119-0742");
+		assertEquals(confList.size(), 6);
 		
 		/* size range < time range */
 		// fetch from file twice
-		confList = dc.getConferenceList("1", "20150507-0800", "20150508-0900");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("5", "20160119-0612", "20160119-0742");
+		assertEquals(confList.size(), 5);
 
-		confList = dc.getConferenceList("1", "20150507-0800", "20150508-0900");
-		assertEquals(confList.size(), 1);
+		confList = dc.getConferenceList("5", "20160119-0612", "20160119-0742");
+		assertEquals(confList.size(), 5);
 	}
 	
 	@Test
@@ -315,12 +315,12 @@ public class TestDtCollector {
 		assertNull(conf);
 		
 		// fetch from file
-		conf = dc.getConferenceSummary("00000000-0000-0000-0000000000000000");
+		conf = dc.getConferenceSummary("00000000-0000-0000-000000000000000A");
 		assertNotNull(conf);
 		assertNull(conf.getStats());
 		
 		// fetch from cache
-		conf = dc.getConferenceSummary("00000000-0000-0000-0000000000000000");
+		conf = dc.getConferenceSummary("00000000-0000-0000-000000000000000A");
 		assertNotNull(conf);
 		assertNull(conf.getStats());
 		System.out.println("Conference stats is null.");
@@ -329,11 +329,11 @@ public class TestDtCollector {
 		Main.cacheIsEnabled = false;
 		
 		// fetch from file twice
-		conf = dc.getConferenceSummary("00000000-0000-0000-0000000000000000");
+		conf = dc.getConferenceSummary("00000000-0000-0000-000000000000000A");
 		assertNotNull(conf);
 		assertNull(conf.getStats());
 				
-		conf = dc.getConferenceSummary("00000000-0000-0000-0000000000000000");
+		conf = dc.getConferenceSummary("00000000-0000-0000-000000000000000A");
 		assertNotNull(conf);
 		assertNull(conf.getStats());
 		System.out.print("Conference stats is null.");
@@ -348,12 +348,12 @@ public class TestDtCollector {
 		assertNull(conf);
 		
 		// fetch from file
-		conf = dc.getConferenceDetails("00000000-0000-0000-0000000000000000");
+		conf = dc.getConferenceDetails("00000000-0000-0000-000000000000000B");
 		assertNotNull(conf);
 		assertNotNull(conf.getStats());
 		
 		// fetch from cache
-		conf = dc.getConferenceDetails("00000000-0000-0000-0000000000000000");
+		conf = dc.getConferenceDetails("00000000-0000-0000-000000000000000B");
 		assertNotNull(conf);
 		assertNotNull(conf.getStats());
 		System.out.println("Conference stats is not null.");
@@ -362,11 +362,11 @@ public class TestDtCollector {
 		Main.cacheIsEnabled = false;
 		
 		// fetch from file twice
-		conf = dc.getConferenceDetails("00000000-0000-0000-0000000000000000");
+		conf = dc.getConferenceDetails("00000000-0000-0000-000000000000000B");
 		assertNotNull(conf);
 		assertNotNull(conf.getStats());
 				
-		conf = dc.getConferenceDetails("00000000-0000-0000-0000000000000000");
+		conf = dc.getConferenceDetails("00000000-0000-0000-000000000000000B");
 		assertNotNull(conf);
 		assertNotNull(conf.getStats());
 		System.out.print("Conference stats is not null.");
@@ -381,11 +381,11 @@ public class TestDtCollector {
 		assertEquals(chanList.size(), 0);
 		
 		// fetch from file
-		chanList = dc.getConfChannels("00000000-0000-0000-0000000000000000");
+		chanList = dc.getConfChannels("00000000-0000-0000-000000000000000E");
 		assertEquals(chanList.size(), 3);
 		
 		// fetch from cache
-		chanList = dc.getConfChannels("00000000-0000-0000-0000000000000000");
+		chanList = dc.getConfChannels("00000000-0000-0000-000000000000000E");
 		assertEquals(chanList.size(), 3);
 		System.out.println("Conference has 3 channels.");
 		
@@ -393,10 +393,10 @@ public class TestDtCollector {
 		Main.cacheIsEnabled = false;
 		
 		// fetch from file twice
-		chanList = dc.getConfChannels("00000000-0000-0000-0000000000000000");
+		chanList = dc.getConfChannels("00000000-0000-0000-000000000000000E");
 		assertEquals(chanList.size(), 3);
 				
-		chanList = dc.getConfChannels("00000000-0000-0000-0000000000000000");
+		chanList = dc.getConfChannels("00000000-0000-0000-000000000000000E");
 		assertEquals(chanList.size(), 3);
 		System.out.println("Conference has 3 channels.");
 	}
@@ -406,16 +406,16 @@ public class TestDtCollector {
 		System.out.println("\n** Get channel summary with cache **");
 		
 		// fetch non-exist channel
-		chan = dc.getChannelSummary("B620092E-1B06-4A4D-829811D6003FB447");
+		chan = dc.getChannelSummary("3C5E66C8-F511-4A8B-99C6FF45C0797800");
 		assertNull(chan);
 		
 		// fetch from file
-		chan = dc.getChannelSummary("B620092E-1B06-4A4D-829811D6003FB46A");
+		chan = dc.getChannelSummary("3C5E66C8-F511-4A8B-99C6FF45C0797812");
 		assertNotNull(chan);
 		assertNull(chan.getStats());
 		
 		// fetch from cache
-		chan = dc.getChannelSummary("B620092E-1B06-4A4D-829811D6003FB46A");
+		chan = dc.getChannelSummary("3C5E66C8-F511-4A8B-99C6FF45C0797812");
 		assertNotNull(chan);
 		assertNull(chan.getStats());
 		System.out.println("Channel stats is null.");
@@ -424,11 +424,11 @@ public class TestDtCollector {
 		Main.cacheIsEnabled = false;
 		
 		// fetch from file twice
-		chan = dc.getChannelSummary("B620092E-1B06-4A4D-829811D6003FB46A");
+		chan = dc.getChannelSummary("3C5E66C8-F511-4A8B-99C6FF45C0797812");
 		assertNotNull(chan);
 		assertNull(chan.getStats());
 				
-		chan = dc.getChannelSummary("B620092E-1B06-4A4D-829811D6003FB46A");
+		chan = dc.getChannelSummary("3C5E66C8-F511-4A8B-99C6FF45C0797812");
 		assertNotNull(chan);
 		assertNull(chan.getStats());
 		System.out.print("Channel stats is null.");
@@ -439,16 +439,46 @@ public class TestDtCollector {
 		System.out.println("\n** Get conference details with cache **");
 		
 		// fetch non-exist channel
-		chan = dc.getChannelDetails("B620092E-1B06-4A4D-829811D6003FB447");
+		chan = dc.getChannelDetails("3C5E66C8-F511-4A8B-99C6FF45C0797800");
 		assertNull(chan);
 		
 		// fetch from file
-		chan = dc.getChannelDetails("B620092E-1B06-4A4D-829811D6003FB46A");
+		chan = dc.getChannelDetails("3C5E66C8-F511-4A8B-99C6FF45C0797812");
 		assertNotNull(chan);
 		assertNotNull(chan.getStats());
+		assertNotNull(chan.getStats().getStrProcessor());
+		assertNotNull(chan.getStats().getStrEnhancer());
+		assertNotNull(chan.getStats().getMixerOut());
+		
+		assertNotNull(chan.getStats().getStrProcessor().getSeqNr());
+		assertNotNull(chan.getStats().getStrProcessor().getRTP_streamBegin());
+		assertNotNull(chan.getStats().getStrProcessor().getRTP_isDelayed());
+		assertNotNull(chan.getStats().getStrProcessor().getRTP_isReordered());
+		assertNotNull(chan.getStats().getStrProcessor().getTimeStamp());
+		assertNotNull(chan.getStats().getStrProcessor().getMedia_BufSize());
+		assertNotNull(chan.getStats().getStrProcessor().getIATJitter());
+		assertNotNull(chan.getStats().getStrProcessor().getNS_speechPowerIn());
+		assertNotNull(chan.getStats().getStrProcessor().getNS_speechPowerOut());
+		assertNotNull(chan.getStats().getStrProcessor().getNS_noisePowerIn());
+		assertNotNull(chan.getStats().getStrProcessor().getNS_noisePowerOut());
+		assertNotNull(chan.getStats().getStrProcessor().getAGC_speechLevelOut());
+		assertNotNull(chan.getStats().getStrProcessor().getAGC_noiseLevelOut());
+		assertNotNull(chan.getStats().getStrProcessor().getAGC_vadState());
+		
+		assertNotNull(chan.getStats().getStrEnhancer().getQNr());
+		assertNotNull(chan.getStats().getStrEnhancer().getQuantumsInJitterBuffer());
+		assertNotNull(chan.getStats().getStrEnhancer().getPacketScaleFast());
+		assertNotNull(chan.getStats().getStrEnhancer().getPacketScaleSlow());
+		assertNotNull(chan.getStats().getStrEnhancer().getPacketScaleFactor());
+		assertNotNull(chan.getStats().getStrEnhancer().getQuantumUnderrunCounter());
+		assertNotNull(chan.getStats().getStrEnhancer().getQuantumType());
+		assertNotNull(chan.getStats().getStrEnhancer().getPopTimeDelta());
+		
+		assertNotNull(chan.getStats().getMixerOut().getSeqNr());
+		assertNotNull(chan.getStats().getMixerOut().getTimeStamp());
 		
 		// fetch from cache
-		chan = dc.getChannelDetails("B620092E-1B06-4A4D-829811D6003FB46A");
+		chan = dc.getChannelDetails("3C5E66C8-F511-4A8B-99C6FF45C0797812");
 		assertNotNull(chan);
 		assertNotNull(chan.getStats());
 		System.out.println("Channel stats is not null.");
@@ -457,11 +487,11 @@ public class TestDtCollector {
 		Main.cacheIsEnabled = false;
 		
 		// fetch from file twice
-		chan = dc.getChannelDetails("B620092E-1B06-4A4D-829811D6003FB46A");
+		chan = dc.getChannelDetails("3C5E66C8-F511-4A8B-99C6FF45C0797812");
 		assertNotNull(chan);
 		assertNotNull(chan.getStats());
 				
-		chan = dc.getChannelDetails("B620092E-1B06-4A4D-829811D6003FB46A");
+		chan = dc.getChannelDetails("3C5E66C8-F511-4A8B-99C6FF45C0797812");
 		assertNotNull(chan);
 		assertNotNull(chan.getStats());
 		System.out.print("Channel stats is not null.");

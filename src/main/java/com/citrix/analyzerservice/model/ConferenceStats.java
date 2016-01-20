@@ -2,14 +2,14 @@ package com.citrix.analyzerservice.model;
 
 public class ConferenceStats {
 	
-	private Mixer mixer;
+	private MixerSum mixSum;
 	
-	public ConferenceStats(Mixer mixer) {
-		this.mixer = mixer;
+	public ConferenceStats(MixerSum mixSum) {
+		this.mixSum = mixSum;
 	}
 
-	public Mixer getMixer() {
-		return mixer;
+	public MixerSum getMixerSum() {
+		return mixSum;
 	}
 	
 	

@@ -1,6 +1,7 @@
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.citrix.analyzerservice.Main;
@@ -47,6 +49,7 @@ public class TestLocalDbContainer {
 	 * Post-condition: folder has conference 0, 1, and both are processed
 	 * */
 	@Test
+	@Ignore
 	public void testFindUpdatedConfIds() throws InterruptedException {
 		System.out.println("\n** Get updated conference IDs **");
 		
@@ -101,6 +104,7 @@ public class TestLocalDbContainer {
 	}
 	
 	@Test
+	@Ignore
 	public void testReadWriteUpdateFile() {
 		System.out.println("\n** Read/Write/Update file **");
 
@@ -148,5 +152,18 @@ public class TestLocalDbContainer {
 		f.delete();
 	}
 	
-
+	@Test
+	public void testFindTimestamp() {
+		System.out.println("\n** Find conference timestamp **");
+		
+		LocalDateTime confTS = ldc.findConferenceTimestamp("00000000-0000-0000-000000000000000A");
+		assertEquals(confTS.toString(), "2016-01-18T14:53:28");
+		System.out.println("Conference 00000000-0000-0000-000000000000000A timestamp: " + confTS);
+		
+		System.out.println("\n** Find channel timestamp **");
+		
+		LocalDateTime chanTS = ldc.findChannelTimestamp("00000000-0000-0000-000000000000000A", "3C5E66C8-F511-4A8B-99C6FF45C0797812");
+		assertEquals(chanTS.toString(), "2016-01-18T14:53:28");
+		System.out.println("Channel 3C5E66C8-F511-4A8B-99C6FF45C0797812 timestamp: " + chanTS);
+	}
 }

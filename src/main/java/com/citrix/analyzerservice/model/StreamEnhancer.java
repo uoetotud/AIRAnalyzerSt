@@ -2,22 +2,58 @@ package com.citrix.analyzerservice.model;
 
 public class StreamEnhancer {
 
-	private double NS_speechPowerOut;
-	private double NS_noisePowerOut;
-
-	public StreamEnhancer(double NS_speechPowerOut, double NS_noisePowerOut) {
-		this.NS_speechPowerOut = NS_speechPowerOut;
-		this.NS_speechPowerOut = NS_noisePowerOut;
-	}
-
-	@SuppressWarnings("unused")
-	private double getNS_speechPowerOut() {
-		return NS_speechPowerOut;
-	}
-
-	@SuppressWarnings("unused")
-	private double getNS_noisePowerOut() {
-		return NS_noisePowerOut;
-	}
+	private double[] QNr;
+	private double[] QuantumsInJitterBuffer;
+	private double[] PacketScaleFast;
+	private double[] PacketScaleSlow;
+	private double[] PacketScaleFactor;
+	private double[] QuantumUnderrunCounter;
+	private double[] QuantumType;
+	private double[] PopTimeDelta;
 	
+	public StreamEnhancer(double[] qNr, double[] quantumsInJitterBuffer, double[] packetScaleFast,
+			double[] packetScaleSlow, double[] packetScaleFactor, double[] quantumUnderrunCounter, double[] quantumType,
+			double[] popTimeDelta) {
+		QNr = qNr;
+		QuantumsInJitterBuffer = quantumsInJitterBuffer;
+		PacketScaleFast = packetScaleFast;
+		PacketScaleSlow = packetScaleSlow;
+		PacketScaleFactor = packetScaleFactor;
+		QuantumUnderrunCounter = quantumUnderrunCounter;
+		QuantumType = quantumType;
+		PopTimeDelta = popTimeDelta;
+	}
+
+	public double[] getQNr() {
+		return QNr;
+	}
+
+	public double[] getQuantumsInJitterBuffer() {
+		return QuantumsInJitterBuffer;
+	}
+
+	public double[] getPacketScaleFast() {
+		return PacketScaleFast;
+	}
+
+	public double[] getPacketScaleSlow() {
+		return PacketScaleSlow;
+	}
+
+	public double[] getPacketScaleFactor() {
+		return PacketScaleFactor;
+	}
+
+	public double[] getQuantumUnderrunCounter() {
+		return QuantumUnderrunCounter;
+	}
+
+	public double[] getQuantumType() {
+		return QuantumType;
+	}
+
+	public double[] getPopTimeDelta() {
+		return PopTimeDelta;
+	}
+
 }

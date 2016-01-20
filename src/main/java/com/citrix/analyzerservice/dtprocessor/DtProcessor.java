@@ -56,7 +56,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 				
 				for (String newConfId : newConfIds) {
 
-					List<String> channelIds = ldc.getConfChannelIds(newConfId);
+					List<String> channelIds = ldc.findConfChannelIds(newConfId);
 					List<ChannelScore> chanScores = new ArrayList<ChannelScore>();
 					
 					for (String channelId : channelIds) {					
@@ -164,7 +164,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 	@Override
 	public boolean updateChanList(String confId, List<ChannelScore> chanScores) {
 		
-		List<String> channelIds = ldc.getConfChannelIds(confId);
+		List<String> channelIds = ldc.findConfChannelIds(confId);
 		if (channelIds == null || channelIds.isEmpty())
 			return false;
 		
@@ -432,7 +432,7 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		}
 		
 		// remove each channel cache of this conference
-		List<String> channelIds = ldc.getConfChannelIds(oldConfId);
+		List<String> channelIds = ldc.findConfChannelIds(oldConfId);
 		for (String channelId : channelIds) {
 			String cs = new StringBuilder(channelId).append("_summary").toString();
 			String cd = new StringBuilder(channelId).append("_details").toString();
