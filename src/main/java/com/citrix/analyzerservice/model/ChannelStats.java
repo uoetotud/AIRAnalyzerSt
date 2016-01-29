@@ -1,5 +1,9 @@
 package com.citrix.analyzerservice.model;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class ChannelStats {
 	
 	private StreamProcessor strProcessor;

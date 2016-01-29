@@ -6,6 +6,10 @@ import java.util.Map;
 
 import com.citrix.analyzerservice.model.ChannelStats;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public interface IDbConnector {
 
 	Map<String, List<String>> findUpdatedConfIds();

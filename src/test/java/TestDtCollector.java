@@ -13,6 +13,10 @@ import com.citrix.analyzerservice.dbconnector.LocalDbChannel;
 import com.citrix.analyzerservice.dbconnector.LocalDbConference;
 import com.citrix.analyzerservice.dtcollector.DtCollector;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class TestDtCollector {
 
 	DtCollector dc = new DtCollector();

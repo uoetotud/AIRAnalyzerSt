@@ -1,5 +1,9 @@
 package com.citrix.analyzerservice.dbconnector;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class DbConnectorFactory {
 
 	public IDbConnector getDbContainer(String db) {

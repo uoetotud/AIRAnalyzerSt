@@ -14,6 +14,10 @@ import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ConferenceScore;
 
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class TestDtProcessor {
 	
 	DtProcessor dp = new DtProcessor();

@@ -5,6 +5,10 @@ import java.util.List;
 import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ConferenceScore;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public interface IDtProcessor {
 	
 	boolean checkUpdate();

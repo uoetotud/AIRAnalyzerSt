@@ -1,5 +1,9 @@
 package com.citrix.analyzerservice.util;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public interface ICache<K, V> {
 
 	V get(K key);

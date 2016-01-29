@@ -9,6 +9,10 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class Config {
 
 	private static final Logger logger = Logger.getLogger(Config.class);
@@ -17,6 +21,10 @@ public class Config {
 	
 	public Config() {}
  
+	/**
+	* This method is used to get properties from the user configuration file.
+	* @return Map: properties of configuration in hashmap
+	*/
 	public Map<String, String> getPropValues() {
  
 		String propFileName = "config.properties";
@@ -31,6 +39,7 @@ public class Config {
 				logger.error(new StringBuilder("Cannot find '").append(propFileName).append("' configuration file."));
 			}
 			
+			/* read configuration file */
 			Enumeration<?> e = prop.propertyNames();
 			while (e.hasMoreElements()) {
 				String key = (String) e.nextElement();
@@ -50,6 +59,9 @@ public class Config {
 		return configs;
 	}
 	
+	/**
+	* This method is used to check the validation of properties in the user configuration file.
+	*/
 	public void checkConfig() {
 		if (configs.isEmpty())
 			configs = getPropValues();

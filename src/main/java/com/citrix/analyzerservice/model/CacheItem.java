@@ -1,5 +1,9 @@
 package com.citrix.analyzerservice.model;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class CacheItem<V> {
 
 	private V cacheObject;

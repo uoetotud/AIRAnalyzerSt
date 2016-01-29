@@ -16,6 +16,10 @@ import com.citrix.analyzerservice.dbconnector.DbConnectorFactory;
 import com.citrix.analyzerservice.dbconnector.IDbConnector;
 import com.citrix.analyzerservice.dtprocessor.DtProcessor;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class TestLocalDbContainer {
 	
 	DbConnectorFactory dcf = new DbConnectorFactory();

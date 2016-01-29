@@ -1,5 +1,9 @@
 package com.citrix.analyzerservice.model;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class StreamProcessor {
 
 	private double[] SeqNr;
@@ -10,6 +14,10 @@ public class StreamProcessor {
 	private double[] TimeStamp;
 	private double[] Media_BufSize;
 	private double[] IATJitter;
+//	private double[] CompJitter;
+//	private double[] CalcJitter;
+//	private double[] PacketsInPacketQueue;
+//	private double[] PacketDropCounter;
 	private double[] NS_speechPowerIn;
 	private double[] NS_speechPowerOut;
 	private double[] NS_noisePowerIn;
@@ -20,6 +28,7 @@ public class StreamProcessor {
 	
 	public StreamProcessor(double[] seqNr, double[] muted, double[] rTP_streamBegin, double[] rTP_isDelayed,
 			double[] rTP_isReordered, double[] timeStamp, double[] media_BufSize, double[] iATJitter,
+//			double[] compJitter, double[] calcJitter, double[] packetsInPacketQueue, double[] packetDropCounter,
 			double[] nS_speechPowerIn, double[] nS_speechPowerOut, double[] nS_noisePowerIn, double[] nS_noisePowerOut,
 			double[] aGC_speechLevelOut, double[] aGC_noiseLevelOut, double[] aGC_vadState) {
 		SeqNr = seqNr;
@@ -30,6 +39,10 @@ public class StreamProcessor {
 		TimeStamp = timeStamp;
 		Media_BufSize = media_BufSize;
 		IATJitter = iATJitter;
+//		CompJitter = compJitter;
+//		CalcJitter = calcJitter;
+//		PacketsInPacketQueue = packetsInPacketQueue;
+//		PacketDropCounter = packetDropCounter;
 		NS_speechPowerIn = nS_speechPowerIn;
 		NS_speechPowerOut = nS_speechPowerOut;
 		NS_noisePowerIn = nS_noisePowerIn;
@@ -70,6 +83,22 @@ public class StreamProcessor {
 	public double[] getIATJitter() {
 		return IATJitter;
 	}
+	
+//	public double[] getCompJitter() {
+//		return CompJitter;
+//	}
+//	
+//	public double[] getCalcJitter() {
+//		return CalcJitter;
+//	}
+//	
+//	public double[] getPacketsInPacketQueue() {
+//		return PacketsInPacketQueue;
+//	}
+//	
+//	public double[] getPacketDropCounter() {
+//		return PacketDropCounter;
+//	}
 
 	public double[] getNS_speechPowerIn() {
 		return NS_speechPowerIn;

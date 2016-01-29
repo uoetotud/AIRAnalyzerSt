@@ -5,6 +5,10 @@ import java.time.LocalDateTime;
 import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ChannelStats;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class LocalDbChannel {
 
 	private String uuid;

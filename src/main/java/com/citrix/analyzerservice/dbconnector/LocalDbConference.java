@@ -6,6 +6,10 @@ import java.util.Collection;
 import com.citrix.analyzerservice.model.ConferenceScore;
 import com.citrix.analyzerservice.model.ConferenceStats;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class LocalDbConference {
 
 	private String uuid;

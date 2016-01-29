@@ -1,5 +1,9 @@
 package com.citrix.analyzerservice.model;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class ConferenceStats {
 	
 	private MixerSum mixSum;
@@ -10,8 +14,6 @@ public class ConferenceStats {
 
 	public MixerSum getMixerSum() {
 		return mixSum;
-	}
-	
-	
+	}	
 
 }

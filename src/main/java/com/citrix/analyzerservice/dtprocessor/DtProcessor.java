@@ -17,12 +17,16 @@ import com.citrix.analyzerservice.model.ChannelScore;
 import com.citrix.analyzerservice.model.ChannelStats;
 import com.citrix.analyzerservice.model.ConferenceScore;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class DtProcessor extends TimerTask implements IDtProcessor {
 	
-	// Constants definitions
+	/* define constants */
 	final double cVADLevelDiff = 20;
 	final int cQuantumSizeMs = 10;
-	final int cTime = 1; // time in sec
+	final int cTime = 1; // time in second
 	
 	private static final Logger logger = Logger.getLogger(DtProcessor.class);
 	
@@ -33,13 +37,18 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 	
 	public DtProcessor() {}
 	
+	/**
+	* This method is the "main" function of DtProcessor.
+	* It is responsible for check file updates, calculate conference/channel scores, 
+	* update ConfList.txt, ChanList.txt files and cache objects if modified.
+	*/
 	public void run() {
 		logger.info("Start data processor...");
 		
 		if (checkUpdate()) {
 			logger.info("Data updated.");
 			
-			// remove conference list from cache
+			/* remove conference list from cache */
 			if (Main.cache != null && Main.cache.contains("ConferenceList")) {
 				logger.info("Conference list in cache removed.");
 				Main.cache.remove("ConferenceList");
@@ -63,14 +72,14 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 						ChannelScore chanScore = calcChannelScore(newConfId, channelId);						
 						chanScores.add(chanScore);
 						
-						// update channel with new score in cache
+						/* update channel with new score in cache */
 						if (Main.cache != null && Main.cache.size() > 0) {
 							updateChanScoreInCache(channelId, chanScore);
 							logger.debug("Updated channel in cache with score.");
 						}
 					}
 					
-					// update channel file
+					/* update channel file */
 					if (!updateChanList(newConfId, chanScores))
 						logger.error("Cannot update ChanList.");
 					else
@@ -79,14 +88,14 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 					confScore = calcConferenceScore(newConfId, chanScores);
 					confScores.add(confScore);
 					
-					// update conference with new score in cache
+					/* update conference with new score in cache */
 					if (Main.cache != null && Main.cache.size() > 0) {
 						updateConfScoreInCache(newConfId, confScore);
 						logger.debug("Updated conference in cache with score.");
 					}
 				}		
 				
-				// update conference file
+				/* update conference file */
 				if (!updateConfList(newConfIds, confScores))
 					logger.error("Cannot update ConfList.");
 				else
@@ -99,19 +108,19 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 				
 				for (String oldConfId : oldConfIds) {
 					
-					// remove conference (including its channels) from cache
+					/* remove conference (including its channels) from cache */
 					if (Main.cache != null && Main.cache.size() > 0) {
 						removeConfernceFromCache(oldConfId);
 						logger.debug("Removed conference with its channels in cache.");
 					}
 					
-					// update conference file
+					/* update conference file */
 					if (!ldc.updateFile("conference", oldConfId))
 						logger.error("Cannot delete items in ConfList.");
 					else
 						logger.debug("Removed conference in ConfList.txt file.");
 					
-					// update channel file
+					/* update channel file */
 					if (!ldc.updateFile("channel", oldConfId))
 						logger.error("Cannot delete items in ChanList.");
 					else
@@ -127,6 +136,10 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		logger.info("DataProcessor stopped.");		
 	}
 	
+	/**
+	* This method is used to check if files are updated in the directory.
+	* @return boolean: files are updated or not
+	*/
 	@Override
 	public boolean checkUpdate() {
 		
@@ -138,6 +151,12 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		return true;
 	}
 	
+	/**
+	* This method is used to update ConfList.txt file.
+	* @param confIds: the IDs of new conferences in list
+	* @param confScores: the scores of new conference in list
+	* @return boolean: update succeeds or not
+	*/
 	@Override
 	public boolean updateConfList(List<String> confIds, List<ConferenceScore> confScores) {
 		
@@ -161,6 +180,12 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 			return false;
 	}
 	
+	/**
+	* This method is used to update ChanList.txt file.
+	* @param confIds: the IDs of new conferences in list
+	* @param chanScores: the scores of channels of new conferences in list
+	* @return boolean: update succeeds or not
+	*/
 	@Override
 	public boolean updateChanList(String confId, List<ChannelScore> chanScores) {
 		
@@ -187,6 +212,12 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 			return false;
 	}
 	
+	/**
+	* This method is used to calculate conference scores.
+	* @param confId: the ID of conference
+	* @param chanScores: the scores of channels of conference in list
+	* @return ConferenceScore: conference scores
+	*/
 	@Override
 	public ConferenceScore calcConferenceScore(String confId, List<ChannelScore> chanScores) {
 		
@@ -214,6 +245,12 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		return score;
 	}
 	
+	/**
+	* This method is used to calculate channel scores.
+	* @param confId: the ID of conference for the channel
+	* @param chanId: the ID of channel
+	* @return ChannelScore: channel scores
+	*/
 	@Override
 	public ChannelScore calcChannelScore(String confId, String chanId) {
 		
@@ -400,6 +437,10 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		return score;
 	}
 	
+	/**
+	* This method is used to remove conference object from cache.
+	* @param oldConfId: the ID of conference that is removed
+	*/
 	private void removeConfernceFromCache(String oldConfId) {
 		String rm = " in cache removed.";
 		String ocs = new StringBuilder(oldConfId).append("_summary").toString();
@@ -442,6 +483,11 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		}
 	}
 	
+	/**
+	* This method is used to update conference object in cache with newly calculated scores.
+	* @param confId: the ID of conference that is updated
+	* @param confScore: the scores of conference that is newly calculated
+	*/
 	private void updateConfScoreInCache(String confId, ConferenceScore confScore) {
 		String ud = " in cache score udpated.";
 		String cs = new StringBuilder(confId).append("_summary").toString();
@@ -460,6 +506,11 @@ public class DtProcessor extends TimerTask implements IDtProcessor {
 		}
 	}
 	
+	/**
+	* This method is used to update channel object in cache with newly calculated scores.
+	* @param chanId: the ID of channel that is updated
+	* @param chanScore: the scores of channel that is newly calculated
+	*/
 	private void updateChanScoreInCache(String chanId, ChannelScore chanScore) {
 		String ud = " in cache score udpated.";
 		String cs = new StringBuilder(chanId).append("_summary").toString();

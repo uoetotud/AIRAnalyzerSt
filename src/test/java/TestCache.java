@@ -16,6 +16,10 @@ import org.junit.Test;
 import com.citrix.analyzerservice.model.CacheItem;
 import com.citrix.analyzerservice.util.Cache;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class TestCache {
 	
 	@SuppressWarnings("rawtypes")

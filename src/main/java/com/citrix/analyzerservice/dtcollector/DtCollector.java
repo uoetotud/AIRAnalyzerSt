@@ -14,6 +14,10 @@ import com.citrix.analyzerservice.dbconnector.LocalDbChannel;
 import com.citrix.analyzerservice.dbconnector.LocalDbConference;
 import com.citrix.analyzerservice.model.CacheItem;
 
+/**
+ * @author Xi Luo
+ *
+ */
 @SuppressWarnings("rawtypes")
 public class DtCollector {
 	
@@ -22,6 +26,13 @@ public class DtCollector {
 	DbConnectorFactory dcf = new DbConnectorFactory();
 	IDbConnector ldc = dcf.getDbContainer("LOCAL");
 	
+	/**
+	* This method is used to get the list of conferences (without statistics).
+	* @param size: maximal number of conferences to show
+	* @param from: earliest timestamp of conference to show
+	* @param to: latest timestamp of conference to show
+	* @return List: (filtered) conferences in arraylist
+	*/
 	@SuppressWarnings("unchecked")
 	public List<LocalDbConference> getConferenceList(String size, String from, String to) {
 		
@@ -41,7 +52,7 @@ public class DtCollector {
 					logger.info(new StringBuilder("Collected ").append(Integer.toString(conferenceList.size())).append(" conferences."));
 					Main.cache.put(key, new CacheItem(conferenceList, System.currentTimeMillis()));
 				} else {
-					logger.info("No channels found.");
+					logger.info("No conference found.");
 					return null;
 				}
 			}
@@ -50,7 +61,7 @@ public class DtCollector {
 			if (conferenceList != null && !conferenceList.isEmpty())
 				logger.info(new StringBuilder("Collected ").append(Integer.toString(conferenceList.size())).append(" conferences."));
 			else {
-				logger.info("No channels found.");
+				logger.info("No conference found.");
 				return null;
 			}
 		}
@@ -61,6 +72,11 @@ public class DtCollector {
 			return filter(conferenceList, size, from, to);
 	}
 	
+	/**
+	* This method is used to get a specific conference (without statistics).
+	* @param confId: the ID of conference
+	* @return LocalDbConference: the conference
+	*/
 	@SuppressWarnings("unchecked")
 	public LocalDbConference getConferenceSummary(String confId) {
 		
@@ -90,6 +106,11 @@ public class DtCollector {
 		return conference;
 	}
 	
+	/**
+	* This method is used to get a specific conference (with statistics).
+	* @param confId: the ID of conference
+	* @return LocalDbConference: the conference
+	*/
 	@SuppressWarnings("unchecked")
 	public LocalDbConference getConferenceDetails(String confId) {
 		
@@ -119,6 +140,11 @@ public class DtCollector {
 		return conference;
 	}
 	
+	/**
+	* This method is used to get the list of channels for a specific conference.
+	* @param confId: the ID of conference
+	* @return List: the channels (without statistics) of conference
+	*/
 	@SuppressWarnings("unchecked")
 	public List<LocalDbChannel> getConfChannels(String confId) {
 		
@@ -153,6 +179,11 @@ public class DtCollector {
 		return channels;
 	}
 	
+	/**
+	* This method is used to get a specific channel (without statistics).
+	* @param chanId: the ID of channel
+	* @return LocalDbChannel: the channel
+	*/
 	@SuppressWarnings("unchecked")
 	public LocalDbChannel getChannelSummary(String chanId) {
 		
@@ -182,6 +213,11 @@ public class DtCollector {
 		return channel;
 	}
 	
+	/**
+	* This method is used to get a specific channel (with statistics).
+	* @param chanId: the ID of channel
+	* @return LocalDbChannel: the channel
+	*/
 	@SuppressWarnings("unchecked")
 	public LocalDbChannel getChannelDetails(String chanId) {
 		
@@ -217,13 +253,13 @@ public class DtCollector {
 		
 		int count = size.equalsIgnoreCase("all") ? confList.size() : Integer.parseInt(size);
 		if (count != confList.size())
-			logger.info(new StringBuilder("Display ").append(Integer.toString(count)).append(" conferences."));
+			logger.info(new StringBuilder("Filter size: ").append(Integer.toString(count)));
 		
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmm");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd-HHmm");
 		LocalDateTime after = from.equalsIgnoreCase("any") ? null : LocalDateTime.parse(from, formatter);
 		LocalDateTime before = to.equalsIgnoreCase("any") ? null : LocalDateTime.parse(to, formatter);
 		if (after != null || before != null)
-			logger.info(new StringBuilder("Display conferences from ").append(from).append(" to ").append(to).append('.'));
+			logger.info(new StringBuilder("Filter time: ").append(from).append(" ~ ").append(to));
 		
 		for (int i=0; i<confList.size(); i++) {
 			conf = confList.get(i);
@@ -236,6 +272,8 @@ public class DtCollector {
 			else
 				break;
 		}
+		
+		logger.info(new StringBuilder("Display ").append(Integer.toString(subConfList.size())).append(" conferences."));
 		
 		return subConfList;
 	}

@@ -1,5 +1,9 @@
 package com.citrix.analyzerservice.model;
 
+/**
+ * @author Xi Luo
+ *
+ */
 public class MixerSum {
 
 	private double[] quantum;
